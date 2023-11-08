@@ -20,9 +20,7 @@ GRADES segments (crop to study area - Idaho, Washington, Oregon) and associated 
 
 ## Notes
 
-The current analysis R script is created in such a way that it only supports one gauge per GRADES river segment. Because the gage records 
-of the streamflow catalog are significantly denser that the original gage placement analysis, this is going to yield less-accurate 
-biases, especially in the case of many gages being grouped closely together. To improve our analysis, this factors should be addressed.
+The current analysis R script is created in such a way that it only supports one gauge per GRADES river segment. Because the gage records of the streamflow catalog are significantly denser that the original gage placement analysis, this is going to yield less-accurate biases, especially in the case of many gages being grouped closely together. To improve our analysis, this factors should be addressed. The current work-around is using a filtering script to only include one gage per GRADES segment and remove any duplicate COMID's.
 
 The freshwater ecoregions variable has been omitted from placement analysis. This will be updated once we have decided on a 
 standard for assigning habitat types to gage locations.
