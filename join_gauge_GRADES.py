@@ -42,7 +42,7 @@ def find_nearest_river(dfpp, dfll, buffersize):
 
 if __name__ == '__main__':
     # Choose specific subset of gages from destination folder
-    catalog = 'H:/Catalog_Subsets/###'
+    catalog = 'H:/Catalog_Subsets/Cont_cat.csv'
     df = pd.read_csv(catalog)[['Gage_No', 'lat', 'long']]
     points = [Point(df.long[j], df.lat[j]) for j in range(len(df))]
 
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     allpoints = pd.concat(allpoints)
 
     # save to file
-    end_dir = wrk_dir + 'GRADES_gage.shp'
+    end_dir = wrk_dir + 'GRADES_gage.csv'
     print('... writing to %s ...' % end_dir)
     allpoints.to_csv(end_dir, index=False)

@@ -15,6 +15,7 @@ def get_USGS(df) -> pd.DataFrame:
     :return: df_usgs; pd.DataFrame of USGS gages
     """
     df_usgs = df[(df['organization dataset'] == 'USGS') | (df['organization'] == 'United States Geological Survey')]
+    df_usgs  = df_usgs.assign(Gage_No=range(1, len(df_usgs) + 1))
     assert not df_usgs.empty, err_msg
     print('df_usgs has {} gages'.format(len(df_usgs)))
     df_usgs.to_csv(wrk_dir + 'USGS_cat.csv',index=False)
@@ -28,6 +29,7 @@ def get_cont(df) -> pd.DataFrame:
     :return: df_cont; pd.DataFrame of continuous gages
     """
     df_cont = df[df['meas.freq'] == 'continuous']
+    df_cont = df_cont.assign(Gage_No=range(1, len(df_cont) + 1))
     assert not df_cont.empty, err_msg
     print('df_cont has {} gages'.format(len(df_cont)))
     df_cont.to_csv(wrk_dir + 'Cont_cat.csv',index=False)
@@ -41,6 +43,7 @@ def get_disc(df) -> pd.DataFrame:
     :return: df_disc; pd.DataFrame of discrete gages
     """
     df_disc = df[df['meas.freq'] == 'discrete']
+    df_disc = df_disc.assign(Gage_No=range(1, len(df_disc) + 1))
     assert not df_disc.empty, err_msg
     print('df_disc has {} gages'.format(len(df_disc)))
     df_disc.to_csv(wrk_dir + 'Discrete_cat.csv',index=False)

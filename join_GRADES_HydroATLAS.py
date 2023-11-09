@@ -18,7 +18,7 @@ from shapely.geometry import Point
 import fiona
 
 
-grades_seg = 'H:/GRADES/GRADES_gage.shp'
+grades_seg = 'H:/GRADES/MERIT_Basins_v0.7_PNW/pfaf_07_riv_3sMERIT_PNW.shp'
 wrk_dir = 'H:/GRADES/'
 def findMidPoint():
     '''
@@ -113,6 +113,6 @@ if __name__ == '__main__':
 
     # save join table as csv file
     print('saving file...')
-    fon = 'C:/Users/stevenschmitz/Desktop/PlacementBias/GRADES_HydroATLAS_join.csv'
+    fon = wrk_dir + 'GRADES_Hydro_Join.csv'
     print('... writing to %s ...' % fon)
     dfjoin.to_csv(fon, index=False)
