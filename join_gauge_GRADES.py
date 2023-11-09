@@ -25,7 +25,7 @@ def find_nearest_river(dfpp, dfll, buffersize):
     print('   create buffer... wait ...')
     poly = dfpp.buffer(buffersize)
     polygpd = gpd.GeoDataFrame(dfpp[['Gage_No', 'long', 'lat']], geometry=poly)
-
+    polygpd.crs = 'EPSG:4326'
     # spatial join
     print('   spatial join with flowlines.. wait ...')
     join = gpd.sjoin(polygpd, dfll, how='inner', op='intersects')
@@ -42,7 +42,7 @@ def find_nearest_river(dfpp, dfll, buffersize):
 
 if __name__ == '__main__':
     # Choose specific subset of gages from destination folder
-    catalog = 'H:/Catalog_Subsets/Cont_cat.csv'
+    catalog = 'H:/Catalog_Subsets/Discrete_cat.csv'
     df = pd.read_csv(catalog)[['Gage_No', 'lat', 'long']]
     points = [Point(df.long[j], df.lat[j]) for j in range(len(df))]
 
@@ -61,6 +61,6 @@ if __name__ == '__main__':
     allpoints = pd.concat(allpoints)
 
     # save to file
-    end_dir = wrk_dir + 'GRADES_gage.csv'
+    end_dir = wrk_dir + 'GRADES_gage_discrete.csv'
     print('... writing to %s ...' % end_dir)
     allpoints.to_csv(end_dir, index=False)
