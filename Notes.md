@@ -14,8 +14,8 @@ The following contents are necessary components of the data file loaded into the
 2. Take main HydroATLAS attribute file and clip out old gage data (stationid, lat, long, distance) so that streamflow catalog dataset can be loaded into it after being merged with GRADES river segments. the COMID from the merge of gage data and GRADES will be used to merge the gage dataset into the HydroATLAS attributes.
 3. Use Arcgis Pro to clip GRADES dataset to study area before merging gages. The GRADES dataset is quite large as it spans the entire globe so this step helps release computer memory for more rapid processing times.
 4. Use join_gauge_GRADES.py to join gages and GRADES data - gage variables should include Gage_No, lat, and long. The output will have an excel sheet with COMID of GRADES river segment and that associated nearest streamflow gage<sup>1</sup> with location data. This COMID will be the merge vector for joining GRADES with HydroATLAS
-5. Use Hydro_attr_merge.py to clip HydroATLAS attributes to study area.
-6. 
+5. Use Hydro_attr_merge.py to clip HydroATLAS attributes to study variables.
+6. Use join_GRADES_HydroATLAS.py to merge output from join_gauge_GRADES.py with output from Hydro_attr_merge.py. The resulting dataset will include gauge information, GRADES data, and HydroATLAS data. This is the dataset that, in .csv format, will be loaded into the placement analysis script.
 
 ## Notes
 
