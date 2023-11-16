@@ -24,7 +24,6 @@ The following contents are necessary components of the data file loaded into the
 
 The freshwater ecoregions variable has been omitted from placement analysis. This will be updated once we have decided on a 
 standard for assigning habitat types to gage locations <- ROOT PROBLEM
+UPDATE 11.16: Issues handling ecoregion assignment in code, need to go through to make sure ecoregion information isn't filtered out.
 
 Need to re-run noFlow script to update flow permanence records for GRADES river segments - last update was in 2021.
-
-Keep generating identical Wasserstein Bias despite gage dataset that is loaded in. Bias keeps generating the same in spite of data subset. Is it not filtering based on gage location properly? <- fixed by adjusting filtering protocols.
