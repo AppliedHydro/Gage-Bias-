@@ -1,3 +1,7 @@
+# As of 11.16, this script is necessary to clean the ecoregion variables and reduce them to integers only - removing string values. The placement analysis code cannot handle string values for
+# ecoregion variables - integers only.
+# date: 11.16.2023
+
 import pandas as pd
 
 def clean_ecoregion_column(csv_file, output_csv):
