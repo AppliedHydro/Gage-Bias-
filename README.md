@@ -23,7 +23,7 @@ A data set containing ~2.94 million vector river polylines and discharge estimat
 HydroATLAS is a global-ranging dataset that contains hydro-environmental characteristics for global river networks. More information can be found [here](https://www.hydrosheds.org/hydroatlas)
 
 ### Streamflow Catalog
-All gage locations have been collected from the current version of the [Streamflow Catalog](https://github.com/AppliedHydro/StreamflowCatalog) on which the authors are also the primary contributors. 
+All gage locations have been collected from the current version of the [Streamflow Catalog](https://scholarworks.boisestate.edu/redi_data/2/)[Git](https://github.com/AppliedHydro/StreamflowCatalog) on which the authors are also the primary contributors. 
 
 ### Python, R, supplementary code
 Ancillary scripts, methods, and data source links were obtained from the [public repository](https://github.com/dry-rivers-rcn/G4) of the Global Gauge Gaps Group (G4) Project.
