@@ -1,9 +1,17 @@
+# Data_filter.py
+#
+# Author: Steven Schmitz
+# date: 11.01.2023
+#
+# Merges the final HydroATLAS dataset (attributes and segments) to GRADES and streamflow gage dataset to create
+# master. The output can be used directly in the placement_analysis.R code as data input.
+
 import pandas as pd
 
-# file paths for HydroATLAS attributes file and GRADES/gage .csv
-wrk_dir = 'H:/'
-attr = wrk_dir + 'HydroATLAS/HydroATLAS_final.csv'
-gages = wrk_dir + 'GRADES/GRADES_gage_discrete.csv'
+wrk_dir = 'H:/'                                    # working directory
+final_path = 'H:/Final_data.csv'                   # output location + file name for final output
+attr = wrk_dir + 'HydroATLAS/HydroATLAS_final.csv' # HydroATLAS attributes file
+gages = wrk_dir + 'GRADES/GRADES_test.csv'         # GRADES/Gage merged file
 
 def Data_final(attr,gages):
     df_A, df_B = pd.read_csv(attr),pd.read_csv(gages)
@@ -11,7 +19,7 @@ def Data_final(attr,gages):
     assert not df_B.empty,"{} is empty. Reload.".format(gages)
 
     # merge the DataFrames based on COMID
-    merged_df = pd.merge(df_A, df_B[['COMID', 'Gage_No', 'lat', 'long']], on='COMID', how='left')
+    merged_df = pd.merge(df_A, df_B[['COMID', 'Gage_No', 'lat', 'long','ecoregion']], on='COMID', how='left')
     # save the merged DataFrame to a new CSV file
     merged_df.to_csv(wrk_dir + 'Final_data.csv', index=False)
     file_path = wrk_dir + 'Final_data.csv'
@@ -27,5 +35,5 @@ def Data_final(attr,gages):
 
 if __name__ == '__main__':
     df = Data_final(attr,gages)
-    df.reset_index().to_csv('H:/Final_data_discrete.csv', index=False)
+    df.reset_index().to_csv(final_path, index=False)
     print('saved to {}'.format(wrk_dir))
