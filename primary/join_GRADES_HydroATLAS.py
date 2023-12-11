@@ -1,3 +1,10 @@
+# join_GRADES_HydroATLAS.py
+#
+# Author: Steven Schmitz
+# date: 11.12.2023
+# Modified for Streamflow Catalog Gage Placement Analysis Project from original file below
+# Source: https://github.com/dry-rivers-rcn/G4
+#
 # Assessing placement bias of the global river gauge network
 # Nature Sustainability
 # Authors: Corey A. Krabbenhoft, George H. Allen, Peirong Lin, Sarah E. Godsey, Daniel C. Allen, Ryan M. Burrows, Amanda G. DelVecchia, Ken M. Fritz, Margaret Shanafield
@@ -18,7 +25,7 @@ from shapely.geometry import Point
 import fiona
 
 
-grades_seg = 'H:/GRADES/MERIT_Basins_v0.7_PNW/pfaf_07_riv_3sMERIT_PNW.shp'
+grades_seg = 'H:/GRADES/GRADES_eco.shp'
 wrk_dir = 'H:/GRADES/'
 def findMidPoint():
     '''
