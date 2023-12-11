@@ -1,11 +1,23 @@
+# Catalog_Subsetting.py
+#
+# Author: Steven Schmitz
+# date: 11.16.2023
+#
+# This code functions as a filtering script to produce new versions of the Streamflow Catalog
+# <https://github.com/AppliedHydro/StreamflowCatalog> sorted by variables of interest to be used in the
+# Placement Analysis <https://github.com/AppliedHydro/Gauge-Placement-Analysis> project. The file output from this
+# script can be input directly into the analysis script per ReadMe instructions.
 
-
+import warnings
 import pandas as pd
 
-wrk_dir = 'H:/Catalog_Subsets/'
-cat_dir = 'C:/Users/stevenschmitz/Desktop/PlacementBias/Streamflow_Catalog.csv'
+wrk_dir = 'H:/Catalog_Subsets/'                # working directory
+cat_dir = wrk_dir + 'Streamflow_Catalog.csv'   # Streamflow catalog csv file
+column_file = 'H:/subset_options.xlsx'         # Excel spreadsheet with callable columns
+file_final = 'XXXX.csv'                        # Output file name
 
 err_msg = 'Dataframe not loaded correctly - check output'
+
 df = pd.read_csv(cat_dir)
 
 # Defining functions of code subsetting
@@ -52,49 +64,34 @@ def get_disc(df) -> pd.DataFrame:
     df_disc.to_csv(wrk_dir + 'Discrete_cat.csv',index=False)
     return df_disc
 
-# Initialization point of the code
-
-# Excel spreadsheet with callable columns
-column_file = #####
-print('Refer to {} for a list of columns names. Use column names as input to '
-      'uniques() in string format to find all available unique values in'
-      'that column. These unique values can be used as inputs to create new'
-      '.xlsx with subset gages.'.format(column_file))
-
-def uniques(file_path, sheet_name = 'Sheet1', column_name):
+def master_subset(catalog_path, column_name, target_value, output_path):
     '''
-    Reads unique columns values to be used for subsetting the output streamflow catalog.
-    :param file_path: file path of streamflow catalog
-    :param sheet_name: in default streamflow catalog, Sheet1 is the primary catalog sheet.
-    :param column_name: column to find unique values from.
-    :return: list of unique values
+    Master subsetting function, saves filtered catalog to output file path to be used
+    for placement analysis.
+    :param catalog_path: directory of streamflow catalog in .csv format
+    :param column_name: name of catalog column that target_value is coming from
+    :param target_value: value used for filtering the catalog
+    :param output_path: save location for filtered catalog as csv
+    :return: pd.DataFrame of filtered catalog
     '''
     try:
-        df = pd.read_excel(file_path, sheet_name=sheet_name)
-        unique_values = df[column_name].unique()
-        return unique_values
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=pd.errors.DtypeWarning)
+            df = pd.read_csv(catalog_path)
+            if column_name == 'huc4':
+                target_value = int(target_value)
+            filtered_df = df[df[column_name] == target_value]
+            assert not filtered_df.empty, "No matching rows found."
+            filtered_df.to_csv(output_path, index=False)
+            print(f"Rows with '{target_value}' saved to {output_path}")
+            return filtered_df
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Error: {e}")
         return None
 
-def master_subset(file_path, column_name, target_value,output_path):
-    try:
-        df = pd.read_excel(file_path)
-        filtered_df = df[df[column_name] == target_value]
-        filtered_df.to_csv(output_path, index=False)
-        print(f"Rows with '{target_value}' saved to {output_file_path}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
 if __name__ == '__main__':
-    #Filter catalog for USGS gages
-    get_USGS(df)
-    print('USGS catalog saved to ' + wrk_dir + '...')
+    print('Refer to {} for column_name and target_value options to filter the'
+          ' gages. File output will be the Streamflow catalog subset to'
+          'including only gages that match the target value.'.format(column_file))
+    master_subset(cat_dir, 'status', 'active', wrk_dir + file_final)
 
-    #Filter catalog for continuous gages
-    get_cont(df)
-    print('Continuous catalog saved to ' + wrk_dir + '...')
-
-    #Filter catalog for discrete gages
-    get_disc(df)
-    print('Discrete catalog saved to ' + wrk_dir + '...')
