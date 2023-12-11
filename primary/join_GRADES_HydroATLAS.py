@@ -17,16 +17,16 @@
 # to spatially join with HydroATLAS river segments
 # the joined table of GRADES river ID (COMID) and HydroATLAS river ID (REACH_ID) are then used to extract river attributes
 
-
 # required library
 import pandas as pd
 import geopandas as gpd
 from shapely.geometry import Point
 import fiona
 
-
 grades_seg = 'H:/GRADES/GRADES_eco.shp'
 wrk_dir = 'H:/GRADES/'
+output_name = 'XXXX.csv'
+
 def findMidPoint():
     '''
     This function reads all GRADES river segments and finds their middle points
@@ -120,6 +120,6 @@ if __name__ == '__main__':
 
     # save join table as csv file
     print('saving file...')
-    fon = wrk_dir + 'GRADES_Hydro_Join.csv'
+    fon = wrk_dir + output_name
     print('... writing to %s ...' % fon)
     dfjoin.to_csv(fon, index=False)
