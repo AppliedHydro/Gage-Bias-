@@ -1,3 +1,7 @@
+## Overview
+
+Welcome to the landing page for the Gage Placement Analysis toolbox. [Krabbenhoft et al (2022)](https://www.nature.com/articles/s41893-022-00873-0) created a workflow process for assessing the placement bias of stream gages using a global stream gage dataset. 19 assorted attributes were selected as the independant variables in the study ranging from socioecological (population, GDP), hydrologic (perennial, non-perennial), and physiographic (mountainous, vegetation type) factors to determine those most instrumental in creating bias in the location and placement of stream gages. This project is predicated on the observation that are significant disparities in the placement of hydrologic gages across the world which impacts decisions made concerning water security, water conservation, and water-monitoring strategies. As a next step for the Streamflow Catalog project, we apply the same processes to the gage locations contained in the up-to-date catalog to obtain a placement bias for gages in the Pacific Northwest (Idaho, Washington, Oregon). The global bias assessment was conducted using 41,000 stream gage locations; the current streamflow catalog has 34,400 gages. The higher quantity of gages contained in a smaller geographic area will ideally produce a higher level of accuracy in the bias assessment. All data used is pubicly available and automations were performed using Python and R coding libraries. 
+
 # StreamflowCatalog_PlacementBias
 **Authors**
 - Kendra Kaiser, Boise State University   | kendrakaiser@boisestate.edu
@@ -9,10 +13,6 @@ This repository contains the gage data from the [Streamflow Catalog](https://git
 1. data sources
 1. methods
 1. source code
-
-## Overview
-
-[Krabbenhoft et al (2022)](https://www.nature.com/articles/s41893-022-00873-0) created a workflow process for assessing the placement bias of stream gages using a global stream gage dataset. 19 assorted attributes were selected as the independant variables in the study ranging from socioecological (population, GDP), hydrologic (perennial, non-perennial), and physiographic (mountainous, vegetation type) factors to determine those most instrumental in creating bias in the location and placement of stream gages. This project is predicated on the observation that are significant disparities in the placement of hydrologic gages across the world which impacts decisions made concerning water security, water conservation, and water-monitoring strategies. As a next step for the Streamflow Catalog project, we apply the same processes to the gage locations contained in the up-to-date catalog to obtain a placement bias for gages in the Pacific Northwest (Idaho, Washington, Oregon). The global bias assessment was conducted using 41,000 stream gage locations; the current streamflow catalog has 34,400 gages. The higher quantity of gages contained in a smaller geographic area will ideally produce a higher level of accuracy in the bias assessment. All data used is pubicly available and automations were performed using Python and R coding libraries. 
 
 ## Data Sources
 
