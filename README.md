@@ -43,7 +43,7 @@ The source material for our gage locations is from the [Streamflow Catalog](http
 ### ii) Code Edits
 Major script files to perform data leaning were obtained from the G4 Public Repository that contains source code used for initial placement analysis. Because the initial studies were conducted in a global study area, code corrections needed to be made to refine the working area of the scripts. Scripts were written in both Python and R, Python being used primarily for spatial analysis using the GeoPandas library. Additionally, file directories and loops needed to be rewritten to access files and quantities unique to our study area.
 
-## Running the Code
+## Getting Started
 This code uses datasets from 3 different locations and will need to be acquired and modified into the appropriate format to execute successfully. If you do not have the files, please refer to section i, Data Assemblage, for procurement information.
 
 ### Step 1. Gathering your Gage Dataset
