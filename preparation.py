@@ -21,51 +21,7 @@ file_final = 'XXXX.csv'                        # Output file name
 
 df = pd.read_csv(cat_dir)
 
-# Defining functions of code subsetting
-def get_USGS(df) -> pd.DataFrame:
-    """
-    Takes the Streamflow Catalog and filters out all rows that are not
-    affiliated with USGS by checking the organization name and the
-    organization dataset.
-    :param df: streamflow catalog as pd.DataFrame object
-    :return: df_usgs; pd.DataFrame of USGS gages
-    """
-    df_usgs = df[(df['organization dataset'] == 'USGS') | (df['organization'] == 'United States Geological Survey')]
-    df_usgs  = df_usgs.assign(Gage_No=range(1, len(df_usgs) + 1))
-    assert not df_usgs.empty, ll.err_msg
-    print('df_usgs has {} gages'.format(len(df_usgs)))
-    df_usgs.to_csv(wrk_dir + 'USGS_cat.csv',index=False)
-    return df_usgs
-
-def get_cont(df) -> pd.DataFrame:
-    """
-    Takes Streamflow Catalog and filters out all rows that are designated
-    as continuous gages (meas.freq == 'continuous').
-    :param df: streamflow catalog as pd.DataFrame object
-    :return: df_cont; pd.DataFrame of continuous gages
-    """
-    df_cont = df[df['meas.freq'] == 'continuous']
-    df_cont = df_cont.assign(Gage_No=range(1, len(df_cont) + 1))
-    assert not df_cont.empty, ll.err_msg
-    print('df_cont has {} gages'.format(len(df_cont)))
-    df_cont.to_csv(wrk_dir + 'Cont_cat.csv',index=False)
-    return df_cont
-
-def get_disc(df) -> pd.DataFrame:
-    """
-    Takes Streamflow Catalog and filters out all rows that are designated
-    as discrete gage measurements (meas.freq == 'discrete').
-    :param df: streamflow catalog as pd.DataFrame object
-    :return: df_disc; pd.DataFrame of discrete gages
-    """
-    df_disc = df[df['meas.freq'] == 'discrete']
-    df_disc = df_disc.assign(Gage_No=range(1, len(df_disc) + 1))
-    assert not df_disc.empty, ll.err_msg
-    print('df_disc has {} gages'.format(len(df_disc)))
-    df_disc.to_csv(wrk_dir + 'Discrete_cat.csv',index=False)
-    return df_disc
-
-def master_subset(catalog_path, column_name, target_value, output_path):
+def master_subset(column_name, target_value,catalog_path, output_path):
     '''
     Master subsetting function, saves filtered catalog to output file path to be used
     for placement analysis.
@@ -94,4 +50,63 @@ if __name__ == '__main__':
     print('Refer to {} for column_name and target_value options to filter the'
           ' gages. File output will be the Streamflow catalog subset to'
           'including only gages that match the target value.'.format(column_file))
-    master_subset(cat_dir, 'status', 'active', wrk_dir + file_final)
+    master_subset('status', 'active', cat_dir, wrk_dir + file_final)
+
+#---------------------------------------------------------------------------#
+# spatially joining GRADES river segments with ecoregion data
+#---------------------------------------------------------------------------#
+
+GRADES = 'H:/GRADES/MERIT_Basins_v0.7_PNW/pfaf_07_riv_3sMERIT_PNW.shp'
+ecoregions = 'H:/Misc/ecoregion_shapefile/eco-region shapefile/region_boundaries_FINAL.shp'
+output_path = 'H:/GRADES/GRADES_eco.shp'
+
+GRADES = gpd.read_file(GRADES)
+ecoregions = gpd.read_file(ecoregions)
+joined_gdf = gpd.sjoin(GRADES, ecoregions, how='left', op='intersects')
+joined_gdf = joined_gdf.rename(columns={'L3_KEY': 'ecoregion'})
+print(joined_gdf.columns)
+joined_gdf.to_file(output_path, driver='ESRI Shapefile')
+
+#---------------------------------------------------------------------------#
+# spatially joining GRADES river segments with gage dataset
+#---------------------------------------------------------------------------#
+
+def find_nearest_river(dfpp, dfll, buffersize):
+    poly = dfpp.buffer(buffersize)
+    polygpd = gpd.GeoDataFrame(dfpp[['Gage_No', 'long', 'lat']], geometry=poly)
+    polygpd.crs = 'EPSG:4326'
+
+    # Spatial join
+    join = gpd.sjoin(polygpd, dfll, how='left', op='intersects')
+
+    # Create a 'geometry_point' column for points
+    join['geometry_point'] = [Point(lon, lat) for lon, lat in zip(join['long'], join['lat'])]
+
+    # Calculate distance
+    join['distance'] = join.apply(lambda row: row['geometry_point'].distance(row['geometry']) if row['geometry'] else None, axis=1)
+
+    # Find the nearest point for each COMID
+    join11 = join.groupby(['COMID']).agg({'distance': 'min', 'Gage_No': 'first', 'lat': 'first', 'long': 'first'}).reset_index()
+
+    # Merge with dfll to get additional variables
+    final = join11.merge(dfll, on='COMID', how='right')[['Gage_No', 'COMID', 'distance', 'lat', 'long', 'ecoregion']]
+
+    return final
+
+if __name__ == '__main__':
+    df = pd.read_csv(catalog)[['Gage_No', 'lat', 'long']]
+    points = [Point(df.long[j], df.lat[j]) for j in range(len(df))]
+    dfpp = gpd.GeoDataFrame(df, geometry=points)
+
+    buffersize = 0.035
+    allpoints = []
+
+    print('... intersecting with Grades')
+    dfll = gpd.read_file(grades_seg)
+
+    allpoints.append(find_nearest_river(dfpp, dfll, buffersize))
+    allpoints = pd.concat(allpoints)
+
+    end_dir = wrk_dir + 'GRADES_test.csv'
+    print('... writing to %s ...' % end_dir)
+    allpoints.to_csv(end_dir, index=False)
