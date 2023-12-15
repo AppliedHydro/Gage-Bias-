@@ -14,10 +14,13 @@
 import lib_loader as ll # all necessary libraries are loaded from lib_loader.py
 ll.setup()
 
-wrk_dir = 'H:/Catalog_Subsets/'                # working directory
+wrk_dir = 'H:/'                                # working directory
 cat_dir = wrk_dir + 'Streamflow_Catalog.csv'   # Streamflow catalog csv file
-column_file = 'H:/subset_options.xlsx'         # Excel spreadsheet with callable columns
-file_final = 'XXXX.csv'                        # Output file name
+column_file = wrk_dir + 'subset_options.xlsx'  # Excel spreadsheet with callable columns
+file_final = wrk_dir + 'Final_data.csv'        # Output file name
+GRADES = 'H:/GRADES/MERIT_Basins_v0.7_PNW/pfaf_07_riv_3sMERIT_PNW.shp'                         # GRADES PNW shapefile
+ecoregions = 'H:/Misc/ecoregion_shapefile/eco-region shapefile/region_boundaries_FINAL.shp'    # Ecoregions shapefile
+attr = wrk_dir + 'HydroATLAS/HydroATLAS_final.csv'                                             # HydroATLAS attributes file
 
 df = pd.read_csv(cat_dir)
 
@@ -50,15 +53,11 @@ if __name__ == '__main__':
     print('Refer to {} for column_name and target_value options to filter the'
           ' gages. File output will be the Streamflow catalog subset to'
           'including only gages that match the target value.'.format(column_file))
-    master_subset('status', 'active', cat_dir, wrk_dir + file_final)
+    master_subset('status', 'active', cat_dir, file_final)
 
 #---------------------------------------------------------------------------#
 # spatially joining GRADES river segments with ecoregion data
 #---------------------------------------------------------------------------#
-
-GRADES = 'H:/GRADES/MERIT_Basins_v0.7_PNW/pfaf_07_riv_3sMERIT_PNW.shp'
-ecoregions = 'H:/Misc/ecoregion_shapefile/eco-region shapefile/region_boundaries_FINAL.shp'
-output_path = 'H:/GRADES/GRADES_eco.shp'
 
 GRADES = gpd.read_file(GRADES)
 ecoregions = gpd.read_file(ecoregions)
@@ -107,7 +106,7 @@ if __name__ == '__main__':
     allpoints.append(find_nearest_river(dfpp, dfll, buffersize))
     allpoints = pd.concat(allpoints)
 
-    end_dir = wrk_dir + 'GRADES_test.csv'
+    end_dir = wrk_dir + 'GRADES/GRADES_merge.csv'
     print('... writing to %s ...' % end_dir)
     allpoints.to_csv(end_dir, index=False)
 
@@ -115,7 +114,7 @@ if __name__ == '__main__':
 # spatially joining GRADES/gage dataset with HydroATLAS
 #---------------------------------------------------------------------------#
 
-def Data_final(attr,gages):
+def Data_final(attr, 'H:/GRADES/GRADES_merge.csv'):
     df_A, df_B = pd.read_csv(attr),pd.read_csv(gages)
     assert not df_A.empty,"{} is empty. Reload.".format(attr)
     assert not df_B.empty,"{} is empty. Reload.".format(gages)
@@ -137,5 +136,5 @@ def Data_final(attr,gages):
 
 if __name__ == '__main__':
     df = Data_final(attr,gages)
-    df.reset_index().to_csv(final_path, index=False)
+    df.reset_index().to_csv(file_final, index=False)
     print('saved to {}'.format(wrk_dir))
