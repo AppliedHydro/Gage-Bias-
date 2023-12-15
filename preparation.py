@@ -14,12 +14,12 @@
 import lib_loader as ll # all necessary libraries are loaded from lib_loader.py
 ll.setup()
 
-wrk_dir = 'H:/'                                # working directory
+wrk_dir = 'H:/gage_bias_master/'                                # working directory
 cat_dir = wrk_dir + 'Streamflow_Catalog.csv'   # Streamflow catalog csv file
 column_file = wrk_dir + 'subset_options.xlsx'  # Excel spreadsheet with callable columns
 file_final = wrk_dir + 'Final_data.csv'        # Output file name
-GRADES = 'H:/GRADES/MERIT_Basins_v0.7_PNW/pfaf_07_riv_3sMERIT_PNW.shp'                         # GRADES PNW shapefile
-ecoregions = 'H:/Misc/ecoregion_shapefile/eco-region shapefile/region_boundaries_FINAL.shp'    # Ecoregions shapefile
+GRADES = wrk_dir + 'GRADES/pfaf_07_riv_3sMERIT_PNW.shp'                         # GRADES PNW shapefile
+ecoregions = wrk_dir + 'Eco/region_boundaries_FINAL.shp'    # Ecoregions shapefile
 attr = wrk_dir + 'HydroATLAS/HydroATLAS_final.csv'                                             # HydroATLAS attributes file
 
 df = pd.read_csv(cat_dir)
@@ -49,22 +49,44 @@ def master_subset(column_name, target_value,catalog_path, output_path):
         print(f"Error: {e}")
         return None
 
+def eco_to_int(data):
+    '''
+    Converts the ecoregion string values in the original catalog format into integer values
+    :param data: local address to streamflow catalog
+    '''
+    # Read the CSV file into a pandas DataFrame
+    df = pd.read_file(data)
+    # dict for ascribing integer values to ecoregion string
+    eco_val = {'nan' : 1, 'Blue Mountains' : 1, 'Northern Basin and Range' : 2, 'Eastern Cascades Slopes and Foothills' : 3,
+               'Cascades' : 4, 'Klamath Mountains/California High North Coast Range' : 5, 'Northern Rockies' : 6,
+               'Strait of Georgia/Puget Lowland' : 7, 'North Cascades' : 8, 'Columbia Plateau' : 9,
+               'Coast Range' : 10, 'Idaho Batholith' : 11, 'Willamette Valley' : 12, 'Middle Rockies' : 13,
+               'Snake River Plain' : 14}
+    
+    eco_col = 'ecoregion'
+    df[eco_col] = df[eco_col].replace(eco_val)
+    # convert floats to integers, ignoring NaN values
+    df[eco_col] = pd.to_numeric(df[eco_col], errors='coerce').astype('Int64')
+    df.to_file(data, index=False)
+    del df
+    
 if __name__ == '__main__':
     print('Refer to {} for column_name and target_value options to filter the'
           ' gages. File output will be the Streamflow catalog subset to'
           'including only gages that match the target value.'.format(column_file))
     master_subset('status', 'active', cat_dir, file_final)
-
+    eco_to_int(file_final)
+    
 #---------------------------------------------------------------------------#
 # spatially joining GRADES river segments with ecoregion data
 #---------------------------------------------------------------------------#
 
-GRADES = gpd.read_file(GRADES)
-ecoregions = gpd.read_file(ecoregions)
-joined_gdf = gpd.sjoin(GRADES, ecoregions, how='left', op='intersects')
+grades = gpd.read_file(GRADES)
+ecoreg = gpd.read_file(ecoregions)
+joined_gdf = gpd.sjoin(grades, ecoreg, how='left', op='intersects')
 joined_gdf = joined_gdf.rename(columns={'L3_KEY': 'ecoregion'})
 print(joined_gdf.columns)
-joined_gdf.to_file(output_path, driver='ESRI Shapefile')
+eco_to_int(GRADES)
 
 #---------------------------------------------------------------------------#
 # spatially joining GRADES river segments with gage dataset
@@ -77,8 +99,6 @@ def find_nearest_river(dfpp, dfll, buffersize):
 
     # Spatial join
     join = gpd.sjoin(polygpd, dfll, how='left', op='intersects')
-
-    # Create a 'geometry_point' column for points
     join['geometry_point'] = [Point(lon, lat) for lon, lat in zip(join['long'], join['lat'])]
 
     # Calculate distance
@@ -89,7 +109,6 @@ def find_nearest_river(dfpp, dfll, buffersize):
 
     # Merge with dfll to get additional variables
     final = join11.merge(dfll, on='COMID', how='right')[['Gage_No', 'COMID', 'distance', 'lat', 'long', 'ecoregion']]
-
     return final
 
 if __name__ == '__main__':
@@ -114,7 +133,7 @@ if __name__ == '__main__':
 # spatially joining GRADES/gage dataset with HydroATLAS
 #---------------------------------------------------------------------------#
 
-def Data_final(attr, 'H:/GRADES/GRADES_merge.csv'):
+def Data_final(attr, gages):
     df_A, df_B = pd.read_csv(attr),pd.read_csv(gages)
     assert not df_A.empty,"{} is empty. Reload.".format(attr)
     assert not df_B.empty,"{} is empty. Reload.".format(gages)
@@ -122,10 +141,10 @@ def Data_final(attr, 'H:/GRADES/GRADES_merge.csv'):
     # merge the DataFrames based on COMID
     merged_df = pd.merge(df_A, df_B[['COMID', 'Gage_No', 'lat', 'long','ecoregion']], on='COMID', how='left')
     # save the merged DataFrame to a new CSV file
-    merged_df.to_csv(wrk_dir + 'Final_data.csv', index=False)
-    file_path = wrk_dir + 'Final_data.csv'
+    merged_df.to_csv(file_final, index=False)
+    del merged_df # release memory
     # read the .csv file and set 'COMID' as the index
-    df = pd.read_csv(file_path)
+    df = pd.read_csv(file_final)
     df.set_index('COMID', inplace=True)
 
     # check for duplicate rows based on 'COMID' index
@@ -135,6 +154,6 @@ def Data_final(attr, 'H:/GRADES/GRADES_merge.csv'):
     return df
 
 if __name__ == '__main__':
-    df = Data_final(attr,gages)
+    df = Data_final(attr, wrk_dir + 'GRADES/GRADES_merge.csv')
     df.reset_index().to_csv(file_final, index=False)
     print('saved to {}'.format(wrk_dir))
