@@ -64,14 +64,14 @@ The analysis is done using the [Placement_analysis.R](https://github.com/Applied
 
 The code works in several steps.
 
-# Calculating Bias
+### Calculating Bias
 The dataset is loaded into the session and is trimmed to the select 13 variables (note that this is not exclusive; variables for analysis can be changed) and the wasserstein distance is calculated for these variabes. A sample image is generated to show 4 variables and their relative bias.
 
 Next, a larger sample image is generated to show visualizations of percent likelihood of occurence of each variable. Up to this point, the code is automated and only requires change in directories (specified at the beginning of the script). The following steps require user input to execute properly.
 
-# Ghost Gage
+### Ghost Gage
 This portion of code seeks to determine a location where a gage should be placed in the target area in order to minimize the bias of a user-selected variable. The user must specify what variable(s) they would like to test. The process of the code is to separate the river segments into 'gaged' or 'ungaged' and then test the bias for each of the 13 variables. Next, the code loops over each ungaged segment and interprets it as a gaged segment and then recalculates the bias. Once each section is iterated over, the product is the ungaged river segment that would minimize the bias of the select variable were a gage to be installed. You can select up to 3 variables.
 
 If you select more than 1 variable, the river segment that will be returned is the segment that has the largest average reduction in bias across the variables not where the bias reduction is at its maximum value. A map is produced that shows the select river segment in relation to the neighboring river segments with COMID (GRADES river segment ID number) and latitude/longitude over the river segment.
 
-The last image output is the select river segment overlayed on satellite imagery with latitude/longitude and ESRI geolabels. 
+The last image output is the select river segment overlayed on satellite imagery with latitude/longitude and ESRI geolabels. These outputs are combined into an Rmarkdown file and saved on to the user's computer. Note that the save directory must be specified at the beginning of the script. 
