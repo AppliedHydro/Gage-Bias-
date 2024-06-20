@@ -38,7 +38,7 @@ date <- Sys.Date()
 
 
 <div class="centered">
-***Gage Placement Bias: Testing `r test_variable`     |     `r date`***
+***Variables: `r test_variable`     |     `r date`***
 </div>
 
 
