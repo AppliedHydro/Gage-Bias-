@@ -1,21 +1,27 @@
-library(tidyverse)
-library(sf)
-library(ggplot2)
-library(SimDesign)
-library(transport)
-library(gridExtra)
-library(heatmaply)
-library(maps)
-library(sp)
-library(leaflet)
-library(rmarkdown)
 
-# importing data
-data <- read.csv('H:/Final_data.csv', header=TRUE)
+#------------------------------------------------#
+# trimming by watershed
+# outputs: Final_data.csv trimmed to specific watershed area
+#------------------------------------------------#
 
-# importing names associated with geospatial variables and major freshwater habitat type
-VARnames <- read.csv('C:/Users/stevenschmitz/Desktop/PlacementBias/Git/G4-master/in/VARnames.csv', header=FALSE)
-ECOnames <- read.csv('C:/Users/stevenschmitz/Desktop/PlacementBias/Git/G4-master/in/ECOnames.csv', header=FALSE)
+print("Importing data...")
+# Read the HUC8/watershed shapefile
+shapefile_path <- "H:/gage_bias_master/GRADES_PNW/WatershedHUC8.shp"
+polygons <- st_read(shapefile_path)
+
+# name of the watershed; see watersheds.csv
+selected_polygon <- polygons %>% filter(NAME == watershed)
+
+# Read the GRADES shapefile
+grades_shapefile_path <- "H:/gage_bias_master/GRADES/grades_seg_merge.shp"
+grades <- st_read(grades_shapefile_path)
+
+grades_sf <- st_as_sf(grades, coords = c("longitude", "latitude"), crs = st_crs(polygons))
+
+grades_within_polygon <- st_join(grades_sf, selected_polygon, join = st_within) %>% 
+  filter(!is.na(NAME))
+comids_within_polygon <- grades_within_polygon$COMID
+data <- data %>% filter(COMID %in% comids_within_polygon)
 
 # --------------------------------------------------------------------------------------------
 # Calculating standard bias and Wassenstein distance for gauge reaches vs. all reaches
@@ -56,7 +62,7 @@ for (p in 1:dim(gagdata[, -1])[2]) {
 
 # --------------------------------------------------------------------------------------------
 # Producing Figure 2
-
+print("Calculating bias...")
 # Figure 2a
 all_bias <- all_bias[order(all_bias$wasser), ] 
 all_bias$Variable <- factor(all_bias$Variable, levels = all_bias$Variable)
@@ -80,7 +86,7 @@ ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, size=wasser, fill=
     axis.title.y=element_blank(), 
     axis.title.x=element_text(colour="black",size=12), 
     panel.background = element_rect(fill = "lightgray", colour="black"),
-    legend.position = c(0.825, 0.1)
+    legend.position.inside = c(0.825, 0.1)
   )
 
 # Figure 2b-f
@@ -91,12 +97,12 @@ temp<-as.matrix(temp)
 comdata<-cbind(temp,as.data.frame(rbind(gagdata,alldata)))
 colnames(comdata)[1]<-"type"
 
-a<-ggplot(comdata, aes(x = pre_mm_cyr,colour=type)) + stat_ecdf(size=1.5) +
+a<-ggplot(comdata, aes(x = pre_mm_cyr,colour=type)) + stat_ecdf(linewidth=1.5) +
   scale_color_manual(values=c("black","#E69F00"),name="River Segment", labels = c("All","Gauged")) + 
   labs(title="a", x="Precipitation (mm/yr)", y="Cumulative probability")  +
   theme(
     panel.grid.minor = element_blank(),
-    legend.position = c(0.85, 0.25),
+    legend.position.inside = c(0.85, 0.25),
     panel.background = element_rect(fill = "lightgray"),
     axis.text.x = element_text(colour="black",size=11), 
     axis.text.y = element_text(colour="black",size=11),
@@ -107,7 +113,7 @@ a<-ggplot(comdata, aes(x = pre_mm_cyr,colour=type)) + stat_ecdf(size=1.5) +
     axis.title.x=element_text(colour="black",size=11), 
   )
 
-b<-ggplot(comdata, aes(x = log10(dor_pc_pva+1),colour=type)) + stat_ecdf(size=1.5) +
+b<-ggplot(comdata, aes(x = log10(dor_pc_pva+1),colour=type)) + stat_ecdf(linewidth=1.5) +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray")) +
@@ -121,7 +127,7 @@ b<-ggplot(comdata, aes(x = log10(dor_pc_pva+1),colour=type)) + stat_ecdf(size=1.
     axis.title.x=element_text(colour="black",size=11), 
   )
 
-c<-ggplot(comdata, aes(x = hft_ix_u09,colour=type)) + stat_ecdf(size=1.5) +
+c<-ggplot(comdata, aes(x = hft_ix_u09,colour=type)) + stat_ecdf(linewidth=1.5) +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray")) +
@@ -135,7 +141,7 @@ c<-ggplot(comdata, aes(x = hft_ix_u09,colour=type)) + stat_ecdf(size=1.5) +
     axis.title.x=element_text(colour="black",size=11), 
   )
 
-d<-ggplot(comdata, aes(x = tmp_dc_cyr/10,colour=type)) + stat_ecdf(size=1.5) +
+d<-ggplot(comdata, aes(x = tmp_dc_cyr/10,colour=type)) + stat_ecdf(linewidth=1.5) +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray")) +
@@ -166,7 +172,7 @@ comdata$pac_pc_cse_log<-log10(comdata$pac_pc_cse+1)
 comdata$ppd_pk_uav_log<-log10(comdata$ppd_pk_uav+0.01)
 comdata$gdp_ud_usu_log<-log10(comdata$gdp_ud_usu+1)
 
-a<-ggplot(comdata, aes(x = uparea_log,colour=type)) + stat_ecdf(size=1.5)  +
+a<-ggplot(comdata, aes(x = uparea_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black", "#E69F00"),name="River Segment", labels = c("All", "Gauged"))  +
   labs(title="a", x=expression(Catchment~Area~(log+1)~(m^2)), y="Cumulative probability")  +
@@ -178,49 +184,49 @@ a<-ggplot(comdata, aes(x = uparea_log,colour=type)) + stat_ecdf(size=1.5)  +
     legend.position = c(0.7, 0.28),
     panel.background = element_rect(fill = "lightgray")
   )
-b<-ggplot(comdata, aes(x = order_,colour=type)) + stat_ecdf(size=1.5)  +
+b<-ggplot(comdata, aes(x = order_,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
   scale_color_manual(values=c("black","#E69F00")) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray"),axis.title.y=element_blank()) +
   labs(title="b", x="Stream Order (Strahler)")  
-c<-ggplot(comdata, aes(x = slope_log,colour=type)) + stat_ecdf(size=1.5)  +
+c<-ggplot(comdata, aes(x = slope_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray"),axis.title.y=element_blank()) +
   labs(title="c", x=expression(Channel~Gradient~(log)~"(%)"))  
-d<-ggplot(comdata, aes(x = pre_mm_cyr_log,colour=type)) + stat_ecdf(size=1.5)  +
+d<-ggplot(comdata, aes(x = pre_mm_cyr_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray")) +
   labs(title="d", x=expression(Precipitation~(log+1)~"(mm/year)"), y="Cumulative probability")
-e<-ggplot(comdata, aes(x = crp_pc_use_log,colour=type)) + stat_ecdf(size=1.5)  +
+e<-ggplot(comdata, aes(x = crp_pc_use_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray"),axis.title.y=element_blank()) +
   labs(title="e", x="Crop Landuse (log+1) (%)")
-f<-ggplot(comdata, aes(x = urb_pc_use_log,colour=type)) + stat_ecdf(size=1.5)  +
+f<-ggplot(comdata, aes(x = urb_pc_use_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray"),axis.title.y=element_blank()) +
   labs(title="f", x="Urban Landuse (log+1) (%)")
-g<-ggplot(comdata, aes(x = pac_pc_cse_log,colour=type)) + stat_ecdf(size=1.5)  +
+g<-ggplot(comdata, aes(x = pac_pc_cse_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray")) +
   labs(title="g", x="Protected Area (log+1) (%)", y="Cumulative probability")
-h<-ggplot(comdata, aes(x = ppd_pk_uav_log,colour=type)) + stat_ecdf(size=1.5)  +
+h<-ggplot(comdata, aes(x = ppd_pk_uav_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray"),axis.title.y=element_blank()) +
   labs(title="h", x=expression(Pop~Density~(log+0.01)~(no.~km^-2)))  
-i<-ggplot(comdata, aes(x = gdp_ud_usu_log,colour=type)) + stat_ecdf(size=1.5)  +
+i<-ggplot(comdata, aes(x = gdp_ud_usu_log,colour=type)) + stat_ecdf(linewidth=1.5)  +
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   scale_y_continuous(limits=c(0,1.0),labels = scales::number_format(accuracy = 0.01)) +
@@ -229,129 +235,20 @@ i<-ggplot(comdata, aes(x = gdp_ud_usu_log,colour=type)) + stat_ecdf(size=1.5)  +
 
 # plotting in a 4-by-4 panel
 grid.arrange(a,b,c,d,e,f,g,h,i)
-
-
-# --------------------------------------------------------------------------------------------
-# Calculating standard bias and Wassenstein distance for gauge reaches vs. all reaches
-# according to Major Freshwater Habitat Types (Freshwater Ecoregions of the World: Abell et al. 2008)
-
-# creating matrix for results
-ECOnames <- read.csv('C:/Users/stevenschmitz/Desktop/PlacementBias/Git/G4-master/in/ECOnames.csv',skip=1, header=FALSE)
-VARnames <- read.csv('C:/Users/stevenschmitz/Desktop/PlacementBias/Git/G4-master/in/VARnames.csv', header=FALSE)
-VARnames <- VARnames[-nrow(VARnames), ]
-
-fht_results <- matrix(, nrow = 12, ncol = 14) #manually set dimensions
-rownames(fht_results) <- t(VARnames)
-colnames(fht_results) <- t(ECOnames)
-print(fht_results)
-
-for (j in 1:13) {
-  # subsetting segments containing gauges and removing 3 reaches with NA
-  gagdata_fht <- data %>%
-    filter(!is.na(Gage_No) & ecoregion == j) %>%
-    select(uparea, order_, dor_pc_pva, slope, tmp_dc_cyr, pre_mm_cyr, crp_pc_use, urb_pc_use, pac_pc_cse, ppd_pk_uav, hft_ix_u09, gdp_ud_usu)
-  
-  # selecting the same variables for all global segments
-  alldata_fht <- data %>%
-    filter(!is.na(dor_pc_pva) & ecoregion == j) %>%
-    select(uparea, order_, dor_pc_pva, slope, tmp_dc_cyr, pre_mm_cyr, crp_pc_use, urb_pc_use, pac_pc_cse, ppd_pk_uav, hft_ix_u09, gdp_ud_usu)
-  
-  # calculating standardized bias and Wasserstein distance and test statistics for each variable
-  print(paste('Processing ecoregion:', j))
-  fht_bias <- matrix(, nrow = 12, ncol = 3)
-  rownames(fht_bias) <- t(VARnames)
-  fht_bias <- cbind(VARnames, fht_bias)
-  fht_bias[, 2] <- bias(gagdata_fht, varmeans[, -ncol(varmeans)], type = 'standardized')
-  colnames(fht_bias) <- c("Variable", "bias", "wasser", "Direction")
-  
-  print('Bias values:')
-  print(fht_bias[, 2])
-  
-  # note that the first column of gagdata and alldata is omitted b/c it is 
-  p = 0
-  for (p in 1:dim(gagdata_fht)[2]) {
-    gagdata_fht_std <- (gagdata_fht[, p] - mean(alldata_fht[, p])) / sd(alldata_fht[, p])
-    fht_bias[p, 3] <- wasserstein1d(gagdata_fht_std, scale(alldata_fht[, p]), p = 1)
-    
-    # Check if fht_bias[p, 2] is not NA before evaluating the condition
-    if (!is.na(fht_bias[p, 2]) && fht_bias[p, 2] < 0) {
-      fht_bias[p, 3] <- as.numeric(fht_bias[p, 3]) * -1
-    }
-  }
-  
-  print('Wasserstein distances:')
-  print(fht_bias[, 3])
-  
-  # output Wasserstein distances
-  fht_results[, j] <- fht_bias[, 3]
-}
-
-print('Final results:')
-print(fht_results)
-
-
-# Producing Figure 3
-theme_set(theme_bw())
-fht_results<-t((fht_results))
-
-a<-heatmaply(fht_results, 
-             dendrogram = "row",
-             xlab = "", ylab = "", 
-             main = "",
-             scale = "none",
-             legend = TRUE,
-             margins = c(60,100,40,20),
-             grid_color = "white",
-             grid_width = 0.00001,
-             titleX = TRUE,
-             hide_colorbar = FALSE,
-             colorbar(titlefont=list(size=5)),
-             branches_lwd = 0.1,
-             label_names = c("FHT", "Variable:", "Value"),
-             fontsize_row = 12, fontsize_col = 12,
-             labCol = colnames(fht_results),
-             labRow = rownames(fht_results),
-             # layout(legend.font="Arial"),
-             scale_fill_gradient_fun = ggplot2::scale_fill_gradient2(
-               low = "dark blue", 
-               high = "dark red", 
-               midpoint = 0, 
-               limits = c(-1.5, 1.5),
-               name="Wasserstein \nDistance (Bias)"),
-             heatmap_layers = theme(axis.line=element_blank(),axis.text.x=element_text(colour="black"),axis.text.y=element_text(colour="black")),
-) 
-
-a %>% layout(xaxis=list(tickfont = list(family = "Helvetica")),yaxis=list(tickfont = list(family = "Helvetica")))
+print("PLot generation completed successfully")
 
 # --------------------------------------------------------------------------------------------
 # calculate the overall change in global bias in gauge placement (averaged across all variables) 
 # if a new gauge were installed
-
-# importing data
-data <- read.csv('H:/Final_data.csv', header=TRUE)
-
-# importing names associated with geospatial variables and major freshwater habitat type
-VARnames <- read.csv('C:/Users/stevenschmitz/Desktop/PlacementBias/Git/G4-master/in/VARnames_noeco.csv', header=FALSE)
-FHTnames <- read.csv('C:/Users/stevenschmitz/Desktop/PlacementBias/Git/G4-master/in/FHTnames.csv', header=FALSE)
-ECOnames <- read.csv('C:/Users/stevenschmitz/Desktop/PlacementBias/Git/G4-master/in/ECOnames.csv', header=FALSE)
-
-# sub-setting reaches to those containing gauges and removing reaches (n=22) with missing geospatial data
-gagdata<-data %>% 
-  filter(!is.na(Gage_No)) %>%
-  select(COMID,uparea,order_,dor_pc_pva,slope,tmp_dc_cyr,pre_mm_cyr,crp_pc_use,urb_pc_use,pac_pc_cse,ppd_pk_uav,hft_ix_u09,gdp_ud_usu,lengthkm) 
-# selecting all reaches and removing reaches (n=13,143) with missing missing geospatial data
-alldata<-data %>% 
-  filter(!is.na(dor_pc_pva)) %>%
-  select(COMID,uparea,order_,dor_pc_pva,slope,tmp_dc_cyr,pre_mm_cyr,crp_pc_use,urb_pc_use,pac_pc_cse,ppd_pk_uav,hft_ix_u09,gdp_ud_usu,lengthkm) 
+#--------------------------------------------------------------------------------------------
 
 # calculating variable means for all data
-
+print("Calculating ghost gage bias...")
 varmeans<-alldata[,-1] %>%
   summarise_all(mean,na.rm=TRUE)
-
 # defining the number of segments
-no.seg<-dim(alldata)[1]
-permutation_bias<-matrix(,ncol=13,nrow=no.seg)
+no.seg<-dim(alldata)
+permutation_bias<-matrix(,ncol=14,nrow=no.seg)
 for (j in 1:no.seg) {
   perdata<-rbind(gagdata, alldata[j,])
   permutation_bias[j,]<-c(alldata[j,1],bias(perdata[,2:(dim(gagdata)[2])],varmeans,type='standardized'))
@@ -359,11 +256,11 @@ for (j in 1:no.seg) {
 
 # calculating % change in bias for each variable and overall mean across variables
 current_bias<-as.matrix(bias(gagdata[,2:(dim(gagdata)[2])],varmeans,type='standardized'))
-temp<-sweep(permutation_bias[,2:13], MARGIN=2,FUN="-", current_bias)
+temp<-sweep(permutation_bias[,2:14], MARGIN=2,FUN="-", current_bias)
 finalbias<-sweep(temp,MARGIN=2,FUN="/", current_bias)*100
 finalbias<-cbind(permutation_bias[,1],finalbias,rowMeans(finalbias[,2:12]))
 finalbias<-as.data.frame(finalbias)
-colnames(finalbias)<-c("COMID", t(VARnames), "MeanBiasChange")
+colnames(finalbias)<-c("COMID", t(VARnames1), "MeanBiasChange")
 
 #This function takes the 'variable_name' argument as a string, refer to alldata import variables
 # variable name - variable you are testing bias for
@@ -375,49 +272,70 @@ colnames(finalbias)<-c("COMID", t(VARnames), "MeanBiasChange")
 # output: COMID:river segment where, if gage were placed, results in max bias reduction
 # 
 
-place_bias <- function(variable_name, alldata, gagdata, varmeans) {
-  if (!(variable_name %in% colnames(gagdata))) stop(paste("Variable", variable_name, "not found in gagdata"))
+place_bias <- function(variable_names, alldata, gagdata, varmeans) {
+  if (!all(variable_names %in% colnames(gagdata))) {
+    stop("Variables not found in gagdata")
+  }
   
-  variables <- c("uparea", "order_", "dor_pc_pva", "slope", "tmp_dc_cyr",
-                 "pre_mm_cyr", "crp_pc_use", "urb_pc_use", "pac_pc_cse",
-                 "ppd_pk_uav", "hft_ix_u09", "gdp_ud_usu")
+  # Common variables used for bias calculation
+  common_variables <- c("uparea", "order_", "dor_pc_pva", "slope", "tmp_dc_cyr",
+                        "pre_mm_cyr", "crp_pc_use", "urb_pc_use", "pac_pc_cse",
+                        "ppd_pk_uav", "hft_ix_u09", "gdp_ud_usu", "ecoregion")
+  if (!all(variable_names %in% common_variables)) {
+    stop("Variables not found in the common variables")
+  }
   
-  if (!(variable_name %in% variables)) stop(paste("Variable", variable_name, "not found in the common variables"))
-  
-  result <- data.frame(COMID = numeric(0), Position = numeric(0), BiasReduction = numeric(0))
+  # Initialize result dataframe
+  result <- data.frame(COMID = numeric(0), Position = numeric(0), AverageReduction = numeric(0))
   
   for (j in 1:nrow(alldata)) {
     if (j %in% gagdata$Position) next
     
-    bias_before <- bias(gagdata[, variables], varmeans, type = 'standardized')
+    # Calculate bias before placing gauge
+    bias_before <- bias(gagdata[, common_variables], varmeans, type = 'standardized')
+    
+    # Add current segment to gauge data and calculate bias after
     perdata <- rbind(gagdata, alldata[j, ])
-    bias_after <- bias(perdata[, variables], varmeans, type = 'standardized')
+    bias_after <- bias(perdata[, common_variables], varmeans, type = 'standardized')
     
-    variable_index <- which(names(bias_before) == variable_name)
-    reduction <- bias_before[variable_index] - bias_after[variable_index]
+    # Calculate reduction for each specified variable
+    reduction <- numeric(length(variable_names))
+    for (k in seq_along(variable_names)) {
+      variable_index <- which(names(bias_before) == variable_names[k])
+      reduction[k] <- bias_before[variable_index] - bias_after[variable_index]
+    }
     
-    result <- rbind(result, data.frame(COMID = alldata[j, "COMID"], Position = j, BiasReduction = reduction))
+    # Calculate average reduction across specified variables
+    avg_reduction <- mean(reduction, na.rm = TRUE)  # Make sure to handle NA values
+    
+    result <- rbind(result, data.frame(COMID = alldata[j, "COMID"], Position = j, AverageReduction = avg_reduction))
   }
   
-  max_reduction_row <- result[which.max(result$BiasReduction), ]
+  # Find COMID with maximum average reduction
+  max_reduction_row <- result[which.max(result$AverageReduction), ]
+  
   return(max_reduction_row)
 }
 
-biasoutput <- place_bias("tmp_dc_cyr", alldata, gagdata, varmeans) # output saved to variable
 
+biasoutput <- place_bias(variable_names, alldata, gagdata, varmeans) # output saved to variable
+print("Done")
+print("Plotting new segment")
 #Plot grades segment with lowest bias
 
-shapefile_path <- 'H:/GRADES/GRADES_eco.shp'
-grades_sf <- st_read(shapefile_path)
+shapefile_path1 <- 'H:/GRADES/GRADES_eco.shp'
+grades_sf <- st_read(shapefile_path1)
 comid <- biasoutput$COMID
 selected_row <- grades_sf[grades_sf$COMID == comid, ]
 
-ggplot() +
+
+map1 <- ggplot() +
   geom_sf(data = grades_sf) +
   geom_sf(data = selected_row, color = "red") +
   labs(title = paste("COMID =", comid), subtitle = paste("Segment Location: ",round(st_bbox(selected_row)$ymax,3),",",round(st_bbox(selected_row)$xmax,3))) +
   coord_sf(xlim = c(st_bbox(selected_row)$xmin - 0.1, st_bbox(selected_row)$xmax + 0.1),
-           ylim = c(st_bbox(selected_row)$ymin - 0.1, st_bbox(selected_row)$ymax + 0.1)) 
+           ylim = c(st_bbox(selected_row)$ymin - 0.1, st_bbox(selected_row)$ymax + 0.1))
+ggsave(map1, file = paste(output_path,"segment1.png") , width = 7, height = 5, units = "in", dpi = 300)
 
 # leaflet
 compute_median_coordinates <- function(multilinestring) {
@@ -432,6 +350,7 @@ median_coordinates[2] <- round(median_coordinates[2],4)
 median_coordinates <- median_coordinates[1:2]
 median_coords_str <- paste(median_coordinates, collapse = ", ")
 
+dev.off()
 leaflet() %>%
   addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
   addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
@@ -443,3 +362,7 @@ leaflet() %>%
     overlayGroups = c("Labels", "Selected Line"),
     options = layersControlOptions(collapsed = FALSE)
   )
+print("Done")
+
+
+
