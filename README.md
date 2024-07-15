@@ -6,12 +6,7 @@ Welcome to the landing page for the Gage Placement Analysis toolbox. [Krabbenhof
 - Kendra Kaiser, Boise State University   | kendrakaiser@boisestate.edu
 - Steven Schmitz, Boise State University  | stevenschmitz@u.boisestate.edu
   
-This repository contains the gage data from the [Streamflow Catalog](https://github.com/AppliedHydro/StreamflowCatalog) project and all relevant files being used to replicate a placement bias assessment as seen in [Krabbenhoft et al (2022)](https://www.nature.com/articles/s41893-022-00873-0). Contained below are the:
-
-1. overview
-1. data sources
-1. methods
-1. source code
+This repository contains the gage data from the [Streamflow Catalog](https://github.com/AppliedHydro/StreamflowCatalog) project and all relevant files being used to replicate a placement bias assessment as seen in [Krabbenhoft et al (2022)](https://www.nature.com/articles/s41893-022-00873-0). 
 
 ## Data Sources
 
@@ -26,10 +21,6 @@ All gage locations have been collected from the current version of the [Streamfl
 
 ### Python, R, supplementary code
 Ancillary scripts, methods, and data source links were obtained from the [public repository](https://github.com/dry-rivers-rcn/G4) of the Global Gauge Gaps Group (G4) Project.
-the 
-## Methods
-
-This section details the pre-processing steps and methodological approach to performing the assessment bias. 
 
 ### i) Data Assemblage
 The background variable data used to conduct the placement bias was assembled from two sources: the GRADES dataset and HydroAtlas. A compilation of 13 variables were chosen and were sourced from GRADES and HydroATLAS datasets and combined into a single dataset using the Python GeoPandas library for geospatial analysis. Specifically, spatial joins were used to assign HydroATLAS variables to GRADES river segments to enable comparison of gages to a single object with all pertinent variables rather than multiple objects in sequence. Prior to spatial joins, the 9 unique HydroATLAS datasets were combined into a single dataset, organized by location, with non-relevant data trimmed off for memory efficiency. The initial HydroATLAS dataset prior to processing was 456 GB in raw format. 
