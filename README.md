@@ -26,7 +26,7 @@ The code process starts by cropping the large dataset (spanning the entire PNW) 
 
 Example:
 
-`variable_names <- c("gdp_ud_usu", "urb_pc_use","pre_mm_cyr")`
+`variable_names <- c("gdp_ud_usu", "urb_pc_use","pre_mm_cyr")`\n
 `watershed <- "South Fork Payette"`
 
 ### Step 3. Processes
