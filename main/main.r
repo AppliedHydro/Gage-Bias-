@@ -45,4 +45,4 @@ interactive_map <- leaflet() %>%
     options = layersControlOptions(collapsed = FALSE)
   )
 
-saveWidget(interactive_map, here('outputs','leaflet_map.html'))
+saveWidget(interactive_map, here('outputs',Sys.Date(),'leaflet_map.html'))
