@@ -16,14 +16,15 @@
 # See Watersheds.csv for possible inputs
 #
 #------------------------------------------------------------------------------#
+library(here)
+here::i_am('main/main.r')
+source(here('main','library.r'))
 
-source('H:/gage_bias_master/library.r')
-
-output_path <- "H:/gage_bias_master/outputs/"
+output_path <- here('outputs')
 variable_names <- c("gdp_ud_usu", "urb_pc_use","pre_mm_cyr")
 watershed <- "South Fork Payette" # for complete list of watersheds, see watersheds.csv
 
-source('H:/gage_bias_master/Placement_analysis.R')
+source(here('main','Placement_analysis.R'))
 
 #--------------------#
 # Leaflet generator of selected segment with maximum bias reduction for
