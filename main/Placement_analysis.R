@@ -325,7 +325,7 @@ print("Done")
 print("Plotting new segment")
 #Plot grades segment with lowest bias
 
-shapefile_path1 <- 'H:/GRADES/GRADES_eco.shp'
+shapefile_path1 <- here('inputs','grades','GRADES_eco.shp')
 grades_sf <- st_read(shapefile_path1)
 comid <- biasoutput$COMID
 selected_row <- grades_sf[grades_sf$COMID == comid, ]
