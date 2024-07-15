@@ -287,8 +287,6 @@ place_bias <- function(variable_names, alldata, gagdata, varmeans) {
   if (!all(variable_names %in% colnames(gagdata))) {
     stop("Variables not found in gagdata")
   }
-  
-  # Common variables used for bias calculation
   common_variables <- c("uparea", "order_", "dor_pc_pva", "slope", "tmp_dc_cyr",
                         "pre_mm_cyr", "crp_pc_use", "urb_pc_use", "pac_pc_cse",
                         "ppd_pk_uav", "hft_ix_u09", "gdp_ud_usu", "ecoregion")
@@ -302,27 +300,27 @@ place_bias <- function(variable_names, alldata, gagdata, varmeans) {
   for (j in 1:nrow(alldata)) {
     if (j %in% gagdata$Position) next
     
-    # Calculate bias before placing gauge
+    # calculate bias before placing gauge
     bias_before <- bias(gagdata[, common_variables], varmeans, type = 'standardized')
     
     # Add current segment to gauge data and calculate bias after
     perdata <- rbind(gagdata, alldata[j, ])
     bias_after <- bias(perdata[, common_variables], varmeans, type = 'standardized')
     
-    # Calculate reduction for each specified variable
+    # calculate reduction for each specified variable
     reduction <- numeric(length(variable_names))
     for (k in seq_along(variable_names)) {
       variable_index <- which(names(bias_before) == variable_names[k])
       reduction[k] <- bias_before[variable_index] - bias_after[variable_index]
     }
     
-    # Calculate average reduction across specified variables
+    # calculate average reduction across specified variables
     avg_reduction <- mean(reduction, na.rm = TRUE)  # Make sure to handle NA values
     
     result <- rbind(result, data.frame(COMID = alldata[j, "COMID"], Position = j, AverageReduction = avg_reduction))
   }
   
-  # Find COMID with maximum average reduction
+  # Find GRADES with maximum average reduction
   max_reduction_row <- result[which.max(result$AverageReduction), ]
   
   return(max_reduction_row)
@@ -332,6 +330,7 @@ place_bias <- function(variable_names, alldata, gagdata, varmeans) {
 biasoutput <- place_bias(variable_names, alldata, gagdata, varmeans) # output saved to variable
 print("Done")
 print("Plotting new segment")
+
 # --------------------------------------------------------------------------------------#
 #Figure 4: GRADES river segment with largest bias reduction across variable(s)
 # --------------------------------------------------------------------------------------#
