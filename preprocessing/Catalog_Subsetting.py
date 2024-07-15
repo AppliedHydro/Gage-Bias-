@@ -1,4 +1,7 @@
-
+#----------#
+# Takes streamflow catalog and filters out gages based on association in case user
+# wants to test for bias for specific organizations
+#----------#
 
 import pandas as pd
 
