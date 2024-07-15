@@ -14,11 +14,11 @@ library(leaflet)
 library(rmarkdown)
 library(htmlwidgets)
 
-data <- read.csv(here('main','Final_data.csv'), header=TRUE)
+data <- read.csv(here('inputs','Final_data.csv'), header=TRUE)
 
-VARnames <- read.csv(here('secondary','VARnames.csv'), header=FALSE)
-ECOnames <- read.csv(here('secondary','ECOnames.csv'), header=FALSE)
-FHTnames <- read.csv(here('secondary','FHTnames.csv'), header=FALSE)
-VARnames1 <- read.csv(here('secondary','VARnames_noeco.csv'), header=FALSE)
+VARnames <- read.csv(here('inputs','VARnames.csv'), header=FALSE)
+ECOnames <- read.csv(here('inputs','ECOnames.csv'), header=FALSE)
+FHTnames <- read.csv(here('inputs','FHTnames.csv'), header=FALSE)
+VARnames1 <- read.csv(here('inputs','VARnames_noeco.csv'), header=FALSE)
 
-shapefile_path <- here('secondary','WatershedHUC8.shp')
+shapefile_path <- here('inputs','WatershedHUC8.shp')
