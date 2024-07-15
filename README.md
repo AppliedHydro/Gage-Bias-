@@ -53,7 +53,7 @@ All gage locations have been collected from the current version of the [Streamfl
 ### Python, R, supplementary code
 Ancillary scripts, methods, and data source links were obtained from the [public repository](https://github.com/dry-rivers-rcn/G4) of the Global Gauge Gaps Group (G4) Project.
 
-### i) Data Assemblage
+
 The background variable data used to conduct the placement bias was assembled from two sources: the GRADES dataset and HydroAtlas. A compilation of 13 variables were chosen and were sourced from GRADES and HydroATLAS datasets and combined into a single dataset using the Python GeoPandas library for geospatial analysis. Specifically, spatial joins were used to assign HydroATLAS variables to GRADES river segments to enable comparison of gages to a single object with all pertinent variables rather than multiple objects in sequence. Prior to spatial joins, the 9 unique HydroATLAS datasets were combined into a single dataset, organized by location, with non-relevant data trimmed off for memory efficiency. The initial HydroATLAS dataset prior to processing was 456 GB in raw format. 
 
 The GRADES river segments dataset encompassed the North American continent and was trimmed to our study area (The Pacific Northwest (PNW): Oregon, Washington, Idaho) using Arcgis Pro geospatial processing tools. The resulting dataset was 14,239 GRADES river segments.
@@ -62,6 +62,5 @@ To combine the datasets accurately, GeoPandas was used to create a series of poi
 
 The source material for our gage locations is from the [Streamflow Catalog](https://github.com/AppliedHydro/StreamflowCatalog). Data was procurred in excel format (.xlsx) and represents the most up-to-date version of the catalog, 9/7/2023, with approximately 36,000 streamflow gages and location data. For the purposes of this study, the dataset was trimmed to include only relevent variables.
 
-### ii) Code Edits
 Major script files to perform data cleaning were obtained from the G4 Public Repository that contains source code used for initial placement analysis. Because the initial studies were conducted in a global study area, code corrections needed to be made to refine the working area of the scripts. Scripts were written in both Python and R, Python being used primarily for spatial analysis using the GeoPandas library. Additionally, file directories and loops needed to be rewritten to access files and quantities unique to our study area.
 
