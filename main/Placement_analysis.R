@@ -6,14 +6,14 @@
 
 print("Importing data...")
 # Read the HUC8/watershed shapefile
-shapefile_path <- here('inputs','WatershedHUC8.shp')
+shapefile_path <- here('inputs','huc8','WatershedHUC8.shp')
 polygons <- st_read(shapefile_path)
 
 # name of the watershed; see watersheds.csv
 selected_polygon <- polygons %>% filter(NAME == watershed)
 
 # Read the GRADES shapefile
-grades_shapefile_path <- here('inputs','grades_seg_merge.shp')
+grades_shapefile_path <- here('inputs','grades','grades_seg_merge.shp')
 grades <- st_read(grades_shapefile_path)
 
 grades_sf <- st_as_sf(grades, coords = c("longitude", "latitude"), crs = st_crs(polygons))
