@@ -41,37 +41,24 @@ To combine the datasets accurately, GeoPandas was used to create a series of poi
 The source material for our gage locations is from the [Streamflow Catalog](https://github.com/AppliedHydro/StreamflowCatalog). Data was procurred in excel format (.xlsx) and represents the most up-to-date version of the catalog, 9/7/2023, with approximately 36,000 streamflow gages and location data. For the purposes of this study, the dataset was trimmed to include only relevent variables.
 
 ### ii) Code Edits
-Major script files to perform data leaning were obtained from the G4 Public Repository that contains source code used for initial placement analysis. Because the initial studies were conducted in a global study area, code corrections needed to be made to refine the working area of the scripts. Scripts were written in both Python and R, Python being used primarily for spatial analysis using the GeoPandas library. Additionally, file directories and loops needed to be rewritten to access files and quantities unique to our study area.
+Major script files to perform data cleaning were obtained from the G4 Public Repository that contains source code used for initial placement analysis. Because the initial studies were conducted in a global study area, code corrections needed to be made to refine the working area of the scripts. Scripts were written in both Python and R, Python being used primarily for spatial analysis using the GeoPandas library. Additionally, file directories and loops needed to be rewritten to access files and quantities unique to our study area.
 
 ## Getting Started
-This code uses datasets from 3 different locations and will need to be acquired and modified into the appropriate format to execute successfully. If you do not have the files, please refer to section i, Data Assemblage, for procurement information.
 
-### Step 1. Gathering your Gage Dataset
-1. Procure the Streamflow Catalog dataset from [Kendra Kaiser](kendrakaiser@boisestate.edu) or [Scholarworks][https://www.boisestate.edu/redi/pnw-streamflowcatalog/].
-2. Load the Catalog into Catalog_Subsetting.py. This script will filter the catalog based on variables that you provide. For instance, you can isolate gages by state, by Huc, or by ecoregion before conducting your placement analysis. Refer to the [subset options](https://github.com/AppliedHydro/Gage-Bias-/blob/master/subset_options.xlsx) to see what variables are available for sorting. The output dataset will be a .csv file with the gages of choice.
-3. Load the filtered Catalog into join_Gauge_GRADES.py along with the GRADES river segments from the appropriate shapefile (see Data Assemblage). This script geospatially merges the location data of the catalog gages with the GRADES river segments and relevant attributes. The output file will be a .csv with catalog gages and the COMID (identification for GRADES segments) of the nearest river segment. The attributes associated with the GRADES river segments is joined with gage information.
-4. Load the merged gage/GRADES with join_GRADES_HydroATLAS.py to geospatially merge HydroATLAS data with the GRADES river segments. The output file will have gage information, COMID (GRADES), and REACH_ID (HydroATLAS).
-5. The final step is to run Data_filter.py which joins these datasets into a final version which contains a) gage location information b) GRADES data c) HydroATLAS attributes. This is the dataset that the placement analysis will be performed on.
 
-The process of analyzing placement bias is restricted to location - The GRADES and hydroATLAS datasets encompass the entire Pacific Northwest so if you are analyzing bias in a smaller region, these river segments will need to be trimmed to your area of focus. This is best done using ArcGIS software prior to combinging with gage dataset. The data uploaded here is cropped to the northwestern United States (Idaho, Oregon, Washington). 
+### Step 1. main.r
+main.r is the launching script - inside 2 variables must be manually input by the user:
 
-### Step 2. Running the Placement Analysis
-The analysis is done using the [Placement_analysis.R](https://github.com/AppliedHydro/Gage-Bias-/blob/master/Placement_analysis.R) program. In addition to the gage dataset created above, two additional files are necessary, VARNames and FHTNames, which can be found in the github repository. These are used for variable tracking and labelling for more efficient code readability. Prior to running the code, the following directories must be updated:
-* Dataset with GRADES, hydroATLAS, Gage information
-* FHTNames directory
-* VARNames directory
-* Save directory for code Rmarkdown output
+* @variable_names: these are the variables that will be tested for bias. Up to 3 can be included. See Variables.csv for options.
+* @watershed: The watershed that will be tested for bias. See Watersheds.csv for options.
 
-The code works in several steps.
+The code process starts by cropping the large dataset (spanning the entire PNW) to the watershed area provided by the user. The GRADES river segments that fall within this watershed boundary are selected and used to denote river sections. 
 
-### Calculating Bias
-The dataset is loaded into the session and is trimmed to the select 13 variables (note that this is not exclusive; variables for analysis can be changed) and the wasserstein distance is calculated for these variabes. A sample image is generated to show 4 variables and their relative bias.
+### Step 2. processes
+main.r first calls library.r to load all input filepaths. The library *here* is used to create relative file directories and load all required libraries. A check is performed to see if your machine has the required packages. If required packages are not present, library.r will automatically install them. **If you change the file structure or file locations within the repository, the code will not execture properly.** 
 
-Next, a larger sample image is generated to show visualizations of percent likelihood of occurence of each variable. Up to this point, the code is automated and only requires change in directories (specified at the beginning of the script). The following steps require user input to execute properly.
+Next, main.r calls Placement_analysis.R which performs the actual analysis and figure creation.
 
-### Ghost Gage
-This portion of code seeks to determine a location where a gage should be placed in the target area in order to minimize the bias of a user-selected variable. The user must specify what variable(s) they would like to test. The process of the code is to separate the river segments into 'gaged' or 'ungaged' and then test the bias for each of the 13 variables. Next, the code loops over each ungaged segment and interprets it as a gaged segment and then recalculates the bias. Once each section is iterated over, the product is the ungaged river segment that would minimize the bias of the select variable were a gage to be installed. You can select up to 3 variables.
+The outputs will be saved in the *output* directory in the main folder. Figures are saved in .png format.
 
-If you select more than 1 variable, the river segment that will be returned is the segment that has the largest average reduction in bias across the variables not where the bias reduction is at its maximum value. A map is produced that shows the select river segment in relation to the neighboring river segments with COMID (GRADES river segment ID number) and latitude/longitude over the river segment.
-
-The last image output is the select river segment overlayed on satellite imagery with latitude/longitude and ESRI geolabels. These outputs are combined into an Rmarkdown file and saved on to the user's computer. Note that the save directory must be specified at the beginning of the script. 
+The final portion of main.r generates an interactive leaflet map that overlays the segment of interest on satellite imagery with labels. An .html object is saved in outputs that can be loaded in the browser to view the segment and location. 
