@@ -1,3 +1,8 @@
+#----------#
+# adds sequential gage numbers to catalog gages - used for 
+# referencing in Placement_analysis.R
+#----------#
+
 import pandas as pd
 
 def add_gage_numbers(csv_file, output_csv):
