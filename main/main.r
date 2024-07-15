@@ -1,7 +1,7 @@
 #------------------------------------------------------------------------------#
 # Main 
 # author: Steven Schmitz
-# last update: 7.2.2024
+# last update: 7.15.2024
 #
 # @variable_names: these are the variables that will be bias tested. You can 
 # as many variable as you choose and the river segment with the largest average
