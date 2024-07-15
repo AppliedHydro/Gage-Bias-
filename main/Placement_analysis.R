@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-(
+
 #------------------------------------------------#
 # trimming by watershed
 # outputs: Final_data.csv trimmed to specific watershed area
