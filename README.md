@@ -1,3 +1,5 @@
+Bias and Wasserstein Distance is calculated over 13 variables in user-specified watershed area. Streams are broken up into segments denoted as gaged or ungaged and then bias is recalculated to find which ungaged sections would reduce bias in user-specified variables were a gage to theoretically be installed. 
+
 ## Overview
 
 Welcome to the landing page for the Gage Placement Analysis toolbox. [Krabbenhoft et al (2022)](https://www.nature.com/articles/s41893-022-00873-0) created a workflow process for assessing the placement bias of stream gages using a global stream gage dataset. 19 assorted attributes were selected as the independant variables in the study ranging from socioecological (population, GDP), hydrologic (perennial, non-perennial), and physiographic (mountainous, vegetation type) factors to determine those most instrumental in creating bias in the location and placement of stream gages. This project is predicated on the observation that are significant disparities in the placement of hydrologic gages across the world which impacts decisions made concerning water security, water conservation, and water-monitoring strategies. As a next step for the Streamflow Catalog project, we apply the same processes to the gage locations contained in the up-to-date catalog to obtain a placement bias for gages in the Pacific Northwest (Idaho, Washington, Oregon). The global bias assessment was conducted using 41,000 stream gage locations; the current streamflow catalog has 34,400 gages. The higher quantity of gages contained in a smaller geographic area will ideally produce a higher level of accuracy in the bias assessment. All data used is pubicly available and automations were performed using Python and R coding libraries. 
@@ -24,8 +26,8 @@ The code process starts by cropping the large dataset (spanning the entire PNW) 
 
 Example:
 
-`variable_names <- c("gdp_ud_usu", "urb_pc_use","pre_mm_cyr")
-watershed <- "South Fork Payette"`
+`variable_names <- c("gdp_ud_usu", "urb_pc_use","pre_mm_cyr")`
+`watershed <- "South Fork Payette"`
 
 ### Step 3. Processes
 main.r first calls library.r to load all input filepaths. The library *here* is used to create relative file directories and load all required libraries. A check is performed to see if your machine has the required packages. If required packages are not present, library.r will automatically install them. **If you change the file structure or file locations within the repository, the code will not execture properly.** 
