@@ -1,5 +1,12 @@
 options(warn = -1) # suppresses console warnings
 
+# check to see if all dependent packages are installed. If not installed, this will automatically install them
+
+packages <- c("here", "tidyverse", "sf", "ggplot2", "SimDesign", "transport", "gridExtra", "heatmaply", "maps", "sp", "leaflet", "rmarkdown", "htmlwidgets")
+installed <- packages %in% rownames(installed.packages())
+if (any(!installed)) install.packages(packages[!installed])
+lapply(packages, library, character.only = TRUE)
+
 library(here)
 library(tidyverse)
 library(sf)
