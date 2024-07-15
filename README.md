@@ -14,7 +14,7 @@ This repository contains the gage data from the [Streamflow Catalog](https://git
 
 ### Step 1. Clone the Repository
 
-On the landing page under <> Code, clone the repository by downloading as a zip file. Once downloaded extract on to your machine. 
+On the landing page under <> Code, clone the repository by downloading as a zip file. Once downloaded, extract to any location on your local machine. Note that it is written into the code to handle relative directories so no manual adjustments are required.
 
 ### Step 2. main.r
 Under the *main* directory, main.r is the launching script that will conduct all necessary actions. Inside exist 2 variables that must be manually input by the user:
