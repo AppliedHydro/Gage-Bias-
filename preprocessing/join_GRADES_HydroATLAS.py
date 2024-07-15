@@ -1,11 +1,3 @@
-# Assessing placement bias of the global river gauge network
-# Nature Sustainability
-# Authors: Corey A. Krabbenhoft, George H. Allen, Peirong Lin, Sarah E. Godsey, Daniel C. Allen, Ryan M. Burrows, Amanda G. DelVecchia, Ken M. Fritz, Margaret Shanafield
-# Amy J. Burgin, Margaret Zimmer, Thibault Datry, Walter K. Dodds, C. Nathan Jones, Meryl C. Mims, Catherin Franklin, John C. Hammond, Samuel C. Zipper, Adam S. Ward,
-# Katie H. Costigan, Hylke E. Beck, and Julian D. Olden
-
-# Date: 2/7/2022
-
 # This code reads GRADES river segments, HydroATLAS river segments, and uses the middle point of all river segments in GRADES
 # to spatially join with HydroATLAS river segments
 # the joined table of GRADES river ID (COMID) and HydroATLAS river ID (REACH_ID) are then used to extract river attributes
