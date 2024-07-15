@@ -14,8 +14,8 @@
 # be cropped too. Currently, only one watershed at a time can be processed. 
 # 
 # See Watersheds.csv for possible inputs
-#
 #------------------------------------------------------------------------------#
+
 library(here)
 here::i_am('main/main.r')
 source(here('main','library.r'))
@@ -29,7 +29,8 @@ source(here('main','Placement_analysis.R'))
 #--------------------#
 # Leaflet generator of selected segment with maximum bias reduction for
 # chosen variables. The GRADES river segment is place on top of 
-# satellite imagery and can be explored interactively.
+# satellite imagery and can be explored interactively. It will be saved
+# in outputs directory as a .html file
 #--------------------#
 
 interactive_map <- leaflet() %>%
