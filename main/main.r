@@ -32,7 +32,7 @@ source(here('main','Placement_analysis.R'))
 # satellite imagery and can be explored interactively.
 #--------------------#
 
-leaflet() %>%
+interactive_map <- leaflet() %>%
   addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
   addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
              label = paste("Segment location", median_coords_str), labelOptions = labelOptions(noHide = TRUE)) %>%
@@ -44,3 +44,4 @@ leaflet() %>%
     options = layersControlOptions(collapsed = FALSE)
   )
 
+saveWidget(interactive_map, here('outputs','leaflet_map.html')
