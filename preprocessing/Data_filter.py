@@ -1,3 +1,7 @@
+#----------#
+# removes duplicates from dataset
+#----------#
+
 import pandas as pd
 
 # file paths for HydroATLAS attributes file and GRADES/gage .csv
