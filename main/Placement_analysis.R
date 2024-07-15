@@ -1,4 +1,3 @@
-
 #------------------------------------------------#
 # trimming by watershed
 # outputs: Final_data.csv trimmed to specific watershed area
@@ -76,7 +75,7 @@ bias_overview <- ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, s
   coord_flip() +
   guides(size="none") +
   scale_y_continuous(limits=c(0,0.8,0)) +
-  theme (
+  theme(
     panel.grid.minor = element_blank(),
     axis.text.x = element_text(colour="black",size=12), 
     axis.text.y = element_text(colour="black",size=12),
@@ -86,7 +85,7 @@ bias_overview <- ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, s
     axis.title.y=element_blank(), 
     axis.title.x=element_text(colour="black",size=12), 
     panel.background = element_rect(fill = "lightgray", colour="black"),
-    legend.position.inside = c(0.825, 0.1)
+    legend.position = c(0.825, 0.1)
   )
 
 ggsave(bias_overview, file = paste(output_path,"bias overview.png") , width = 7, height = 5, units = "in", dpi = 300)
@@ -103,7 +102,7 @@ a<-ggplot(comdata, aes(x = pre_mm_cyr,colour=type)) + stat_ecdf(linewidth=1.5) +
   labs(title="a", x="Precipitation (mm/yr)", y="Cumulative probability")  +
   theme(
     panel.grid.minor = element_blank(),
-    legend.position.inside = c(0.85, 0.25),
+    legend.position = c(0.85, 0.25),
     panel.background = element_rect(fill = "lightgray"),
     axis.text.x = element_text(colour="black",size=11), 
     axis.text.y = element_text(colour="black",size=11),
