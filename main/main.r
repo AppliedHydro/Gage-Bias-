@@ -21,7 +21,7 @@ source('H:/gage_bias_master/library.r')
 
 output_path <- "H:/gage_bias_master/outputs/"
 variable_names <- c("gdp_ud_usu", "urb_pc_use","pre_mm_cyr")
-watershed <- "North Fork Payette" # for complete list of watersheds, see watersheds.csv
+watershed <- "South Fork Payette" # for complete list of watersheds, see watersheds.csv
 
 source('H:/gage_bias_master/Placement_analysis.R')
 
