@@ -68,7 +68,7 @@ all_bias <- all_bias[order(all_bias$wasser), ]
 all_bias$Variable <- factor(all_bias$Variable, levels = all_bias$Variable)
 all_bias$Direction <- factor(all_bias$Direction, levels = c("positive","negative"))
 
-ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, size=wasser, fill=Direction)) + 
+bias_overview <- ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, size=wasser, fill=Direction)) + 
   geom_point(alpha=1)  + scale_size(range = c(1, 6)) +
   scale_color_manual(values=c("blue", "red"),name="Bias Direction", labels = c("Positive","Negative")) + 
   scale_fill_manual(values=c("blue", "red"),name="Bias Direction", labels = c("Positive","Negative")) + 
@@ -89,6 +89,7 @@ ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, size=wasser, fill=
     legend.position.inside = c(0.825, 0.1)
   )
 
+ggsave(bias_overview, file = paste(output_path,"bias overview.png") , width = 7, height = 5, units = "in", dpi = 300)
 # Figure 2b-f
 
 # Plotting variable distributions to highlight some examples
@@ -145,7 +146,7 @@ d<-ggplot(comdata, aes(x = tmp_dc_cyr/10,colour=type)) + stat_ecdf(linewidth=1.5
   theme_bw() + 
   scale_color_manual(values=c("black","#E69F00")) +
   theme(panel.grid.minor = element_blank(),legend.position = "none",panel.background = element_rect(fill = "lightgray")) +
-  labs(title="d", x="Air Temperature (°C)", y="Cumulative probability")   +
+  labs(title="d", x="Air Temperature (Â°C)", y="Cumulative probability")   +
   theme(
     panel.grid.minor = element_blank(),
     panel.background = element_rect(fill = "lightgray"),
@@ -156,8 +157,8 @@ d<-ggplot(comdata, aes(x = tmp_dc_cyr/10,colour=type)) + stat_ecdf(linewidth=1.5
   )
 
 # plotting in a 2-by-2 panel
-grid.arrange(a,c,b,d)
-
+grid1 <- grid.arrange(a,c,b,d)
+ggsave(grid1, file = paste(output_path,"grid1.png") , width = 7, height = 5, units = "in", dpi = 300)
 # --------------------------------------------------------------------------------------------
 # Producing Figure S4
 
@@ -234,7 +235,8 @@ i<-ggplot(comdata, aes(x = gdp_ud_usu_log,colour=type)) + stat_ecdf(linewidth=1.
   labs(title="i", x="Gross Domest Prod (log+1) (USD)")  
 
 # plotting in a 4-by-4 panel
-grid.arrange(a,b,c,d,e,f,g,h,i)
+grid2 <- grid.arrange(a,b,c,d,e,f,g,h,i)
+ggsave(grid2, file = paste(output_path,"grid2.png") , width = 7, height = 5, units = "in", dpi = 300)
 print("PLot generation completed successfully")
 
 # --------------------------------------------------------------------------------------------
@@ -247,12 +249,13 @@ print("Calculating ghost gage bias...")
 varmeans<-alldata[,-1] %>%
   summarise_all(mean,na.rm=TRUE)
 # defining the number of segments
-no.seg<-dim(alldata)
+no.seg<-dim(alldata)[1]
 permutation_bias<-matrix(,ncol=14,nrow=no.seg)
 for (j in 1:no.seg) {
   perdata<-rbind(gagdata, alldata[j,])
   permutation_bias[j,]<-c(alldata[j,1],bias(perdata[,2:(dim(gagdata)[2])],varmeans,type='standardized'))
 }
+
 
 # calculating % change in bias for each variable and overall mean across variables
 current_bias<-as.matrix(bias(gagdata[,2:(dim(gagdata)[2])],varmeans,type='standardized'))
@@ -351,17 +354,23 @@ median_coordinates <- median_coordinates[1:2]
 median_coords_str <- paste(median_coordinates, collapse = ", ")
 
 dev.off()
-leaflet() %>%
-  addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
-  addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
-             label = paste("Segment location", median_coords_str), labelOptions = labelOptions(noHide = TRUE)) %>%
-  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-  addProviderTiles(providers$Esri.WorldImageryLabels, group = "Labels") %>%
-  addLayersControl(
-    baseGroups = c("Satellite"),
-    overlayGroups = c("Labels", "Selected Line"),
-    options = layersControlOptions(collapsed = FALSE)
-  )
+
+#----------#
+# leaflet doesn't load properly when called in Placement_analysis.R from main.r
+# leaflet() has be copied over to be loaded in main.r
+#----------#
+#leaflet() %>%
+#  addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
+#  addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
+#             label = paste("Segment location", median_coords_str), labelOptions = labelOptions(noHide = TRUE)) %>%
+#  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+#  addProviderTiles(providers$Esri.WorldImageryLabels, group = "Labels") %>%
+#  addLayersControl(
+#    baseGroups = c("Satellite"),
+#    overlayGroups = c("Labels", "Selected Line"),
+#    options = layersControlOptions(collapsed = FALSE)
+#  )
+
 print("Done")
 
 
