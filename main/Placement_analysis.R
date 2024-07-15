@@ -22,8 +22,9 @@ grades_within_polygon <- st_join(grades_sf, selected_polygon, join = st_within) 
 comids_within_polygon <- grades_within_polygon$COMID
 data <- data %>% filter(COMID %in% comids_within_polygon)
 
-# --------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------#
 # Calculating standard bias and Wassenstein distance for gauge reaches vs. all reaches
+# --------------------------------------------------------------------------------------#
 
 # sub-setting reaches to those containing gauges and removing reaches (n=22) with missing geospatial data
 gagdata<-data %>% 
@@ -59,10 +60,11 @@ for (p in 1:dim(gagdata[, -1])[2]) {
   }
 }
 
-# --------------------------------------------------------------------------------------------
-# Producing Figure 2
+# --------------------------------------------------------------------------------------#
+# Producing Figure 1: overview and direction of calculated bias
+# --------------------------------------------------------------------------------------#
 print("Calculating bias...")
-# Figure 2a
+
 all_bias <- all_bias[order(all_bias$wasser), ] 
 all_bias$Variable <- factor(all_bias$Variable, levels = all_bias$Variable)
 all_bias$Direction <- factor(all_bias$Direction, levels = c("positive","negative"))
@@ -89,9 +91,11 @@ bias_overview <- ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, s
   )
 
 ggsave(bias_overview, file = file.path(output_path,"bias overview.png") , width = 7, height = 5, units = "in", dpi = 300)
-# Figure 2b-f
 
-# Plotting variable distributions to highlight some examples
+# --------------------------------------------------------------------------------------#
+# Figure 2: Plotting variable distributions to highlight some examples
+# --------------------------------------------------------------------------------------#
+
 temp<-c(rep("gag",dim(gagdata)[1]),rep("all",dim(alldata)[1]))
 temp<-as.matrix(temp)
 comdata<-cbind(temp,as.data.frame(rbind(gagdata,alldata)))
@@ -158,8 +162,11 @@ d<-ggplot(comdata, aes(x = tmp_dc_cyr/10,colour=type)) + stat_ecdf(linewidth=1.5
 # plotting in a 2-by-2 panel
 grid1 <- grid.arrange(a,c,b,d)
 ggsave(grid1, file = file.path(output_path,"grid1.png") , width = 7, height = 5, units = "in", dpi = 300)
-# --------------------------------------------------------------------------------------------
-# Producing Figure S4
+
+# --------------------------------------------------------------------------------------#
+# Producing Figure 3: transforming data to aid intepretation
+# --------------------------------------------------------------------------------------#
+
 
 # transforming data to aid intepretation
 comdata$type <- factor(comdata$type, levels = c("all","gag"))
@@ -238,10 +245,10 @@ grid2 <- grid.arrange(a,b,c,d,e,f,g,h,i)
 ggsave(grid2, file = file.path(output_path,"grid2.png") , width = 7, height = 5, units = "in", dpi = 300)
 print("PLot generation completed successfully")
 
-# --------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------#
 # calculate the overall change in global bias in gauge placement (averaged across all variables) 
 # if a new gauge were installed
-#--------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------#
 
 # calculating variable means for all data
 print("Calculating ghost gage bias...")
@@ -264,15 +271,17 @@ finalbias<-cbind(permutation_bias[,1],finalbias,rowMeans(finalbias[,2:12]))
 finalbias<-as.data.frame(finalbias)
 colnames(finalbias)<-c("COMID", t(VARnames1), "MeanBiasChange")
 
+# --------------------------------------------------------------------------------------#
 #This function takes the 'variable_name' argument as a string, refer to alldata import variables
-# variable name - variable you are testing bias for
+# variable name - variable(s) you are testing bias for
 # alldata - see above
 #
 # This function is telling you, based on all of the locations in alldata, where the bias reduction
-# would be the most if a gage were placed there.
+# would be the maximum if a gage were placed there.
 # 
 # output: COMID:river segment where, if gage were placed, results in max bias reduction
 # 
+# --------------------------------------------------------------------------------------#
 
 place_bias <- function(variable_names, alldata, gagdata, varmeans) {
   if (!all(variable_names %in% colnames(gagdata))) {
@@ -323,7 +332,9 @@ place_bias <- function(variable_names, alldata, gagdata, varmeans) {
 biasoutput <- place_bias(variable_names, alldata, gagdata, varmeans) # output saved to variable
 print("Done")
 print("Plotting new segment")
-#Plot grades segment with lowest bias
+# --------------------------------------------------------------------------------------#
+#Figure 4: GRADES river segment with largest bias reduction across variable(s)
+# --------------------------------------------------------------------------------------#
 
 shapefile_path1 <- here('inputs','grades','GRADES_eco.shp')
 grades_sf <- st_read(shapefile_path1)
@@ -354,10 +365,11 @@ median_coords_str <- paste(median_coordinates, collapse = ", ")
 
 dev.off()
 
-#----------#
+# --------------------------------------------------------------------------------------#
 # leaflet doesn't load properly when called in Placement_analysis.R from main.r
 # leaflet() has be copied over to be loaded in main.r
-#----------#
+# --------------------------------------------------------------------------------------#
+
 #leaflet() %>%
 #  addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
 #  addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
