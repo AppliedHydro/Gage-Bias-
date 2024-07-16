@@ -410,17 +410,26 @@ dev.off()
 # leaflet() has be copied over to be loaded in main.r
 # --------------------------------------------------------------------------------------#
 
-#leaflet() %>%
-#  addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
-#  addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
-#             label = paste("Segment location", median_coords_str), labelOptions = labelOptions(noHide = TRUE)) %>%
-#  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
-#  addProviderTiles(providers$Esri.WorldImageryLabels, group = "Labels") %>%
-#  addLayersControl(
-#    baseGroups = c("Satellite"),
-#    overlayGroups = c("Labels", "Selected Line"),
-#    options = layersControlOptions(collapsed = FALSE)
-#  )
+# --------------------------------------------------------------------------------------#
+# leaflet doesn't load properly when called in Placement_analysis.R from main.r
+# leaflet() has be copied over to be loaded in main.r
+# --------------------------------------------------------------------------------------#
+
+print("Generating Leaflet Map...")
+interactive_map <- leaflet() %>%
+  addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
+  addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
+             label = paste("Segment location", median_coords_str), labelOptions = labelOptions(noHide = TRUE)) %>%
+  addProviderTiles("Esri.WorldImagery", group = "Map") %>%
+  addProviderTiles("OpenStreetMap.Mapnik", group = "Labels") %>%
+  addLayersControl(
+    baseGroups = c("Map", "Labels"),
+    overlayGroups = c("Selected Line"),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+  
+saveWidget(interactive_map, here(output_path, paste0(Sys.Date(), '_leaflet_map.html')))
+
 
 print("Done")
 
