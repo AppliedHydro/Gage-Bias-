@@ -90,7 +90,7 @@ bias_overview <- ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, s
     legend.position = c(0.825, 0.1)
   )
 
-ggsave(bias_overview, file = file.path(output_path,Sys.Date(),"bias overview.png") , width = 7, height = 5, units = "in", dpi = 300)
+ggsave(bias_overview, file = file.path(output_path,"bias overview.png") , width = 7, height = 5, units = "in", dpi = 300)
 
 # --------------------------------------------------------------------------------------#
 # Figure 2: Variable distributions of select variables
@@ -125,7 +125,7 @@ for (var in variable_names) {
   plots[[var]] <- create_plot(var)
 }
 
-png(filename = file.path(output_path,Sys.Date(),"select_variables.png"), width = 700, height = 500)
+png(filename = file.path(output_path,"select_variables.png"), width = 700, height = 500)
 
 grid.newpage()
 pushViewport(viewport(layout = grid.layout(1, length(variable_names))))
@@ -202,7 +202,7 @@ d<-ggplot(comdata, aes(x = tmp_dc_cyr/10,colour=type)) + stat_ecdf(linewidth=1.5
 
 # plotting in a 2-by-2 panel
 grid1 <- grid.arrange(a,c,b,d)
-ggsave(grid1, file = file.path(output_path,Sys.Date(),"example_grid1.png") , width = 7, height = 5, units = "in", dpi = 300)
+ggsave(grid1, file = file.path(output_path,"example_grid1.png") , width = 7, height = 5, units = "in", dpi = 300)
 
 # --------------------------------------------------------------------------------------#
 # Producing Figure 3,4: transforming data to aid intepretation
@@ -283,7 +283,7 @@ i<-ggplot(comdata, aes(x = gdp_ud_usu_log,colour=type)) + stat_ecdf(linewidth=1.
 
 # plotting in a 4-by-4 panel
 grid2 <- grid.arrange(a,b,c,d,e,f,g,h,i)
-ggsave(grid2, file = file.path(output_path,Sys.Date(),"example_grid2.png") , width = 7, height = 5, units = "in", dpi = 300)
+ggsave(grid2, file = file.path(output_path,"example_grid2.png") , width = 7, height = 5, units = "in", dpi = 300)
 print("PLot generation completed successfully")
 
 # --------------------------------------------------------------------------------------#
@@ -388,7 +388,7 @@ map1 <- ggplot() +
   labs(title = paste("COMID =", comid), subtitle = paste("Segment Location: ",round(st_bbox(selected_row)$ymax,3),",",round(st_bbox(selected_row)$xmax,3))) +
   coord_sf(xlim = c(st_bbox(selected_row)$xmin - 0.1, st_bbox(selected_row)$xmax + 0.1),
            ylim = c(st_bbox(selected_row)$ymin - 0.1, st_bbox(selected_row)$ymax + 0.1))
-ggsave(map1, file = file.path(output_path,Sys.Date(),"segment_location.png") , width = 7, height = 5, units = "in", dpi = 300)
+ggsave(map1, file = file.path(output_path,"segment_location.png") , width = 7, height = 5, units = "in", dpi = 300)
 
 # leaflet
 compute_median_coordinates <- function(multilinestring) {
