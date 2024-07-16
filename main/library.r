@@ -21,6 +21,7 @@ library(sp)
 library(leaflet)
 library(rmarkdown)
 library(htmlwidgets)
+library(grid)
 
 data <- read.csv(here('inputs','Final_data.csv'), header=TRUE)
 
