@@ -46,3 +46,4 @@ interactive_map <- leaflet() %>%
   )
 
 saveWidget(interactive_map, here('outputs',Sys.Date(),'leaflet_map.html'))
+
