@@ -26,24 +26,3 @@ watershed <- "South Fork Payette" # for complete list of watersheds, see watersh
 
 source(here('main','Placement_analysis.R'))
 
-#--------------------#
-# Leaflet generator of selected segment with maximum bias reduction for
-# chosen variables. The GRADES river segment is place on top of 
-# satellite imagery and can be explored interactively. It will be saved
-# in outputs directory as a .html file
-#--------------------#
-
-interactive_map <- leaflet() %>%
-  addPolylines(data = selected_row, color = "red", weight = 4, group = "Selected Line") %>%
-  addMarkers(lat = median_coordinates[2], lng = median_coordinates[1],
-             label = paste("Segment location", median_coords_str), labelOptions = labelOptions(noHide = TRUE)) %>%
-  addProviderTiles("Esri.WorldImagery", group = "Map") %>%
-  addProviderTiles("OpenStreetMap.Mapnik", group = "Labels") %>%
-  addLayersControl(
-    baseGroups = c("Map", "Labels"),
-    overlayGroups = c("Selected Line"),
-    options = layersControlOptions(collapsed = FALSE)
-  )
-
-saveWidget(interactive_map, here('outputs',Sys.Date(),'leaflet_map.html'))
-
