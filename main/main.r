@@ -29,5 +29,5 @@ variable_names <- c("gdp_ud_usu", "urb_pc_use","pre_mm_cyr")
 watershed <- "South Fork Payette" # for complete list of watersheds, see watersheds.csv
 
 source(here('main','Placement_analysis.R'))
-rmarkdown::render("gage_bias.Rmd")
+rmarkdown::render("gage_bias.Rmd",output_file = (here("outputs","Gage_bias.html")))
 
