@@ -93,13 +93,54 @@ bias_overview <- ggplot(all_bias, aes(x=Variable, y=`wasser`, color=Direction, s
 ggsave(bias_overview, file = file.path(output_path,Sys.Date(),"bias overview.png") , width = 7, height = 5, units = "in", dpi = 300)
 
 # --------------------------------------------------------------------------------------#
-# Figure 2: Plotting variable distributions to highlight some examples
+# Figure 1.5: Variable distributions of select variables
 # --------------------------------------------------------------------------------------#
 
 temp<-c(rep("gag",dim(gagdata)[1]),rep("all",dim(alldata)[1]))
 temp<-as.matrix(temp)
 comdata<-cbind(temp,as.data.frame(rbind(gagdata,alldata)))
 colnames(comdata)[1]<-"type"
+
+create_plot <- function(var) {
+  ggplot(comdata, aes_string(x = var, colour = "type")) + 
+    stat_ecdf(linewidth = 1.5) +
+    scale_color_manual(values = c("black", "#E69F00"), name = "River Segment", labels = c("All", "Gauged")) + 
+    labs(x = var, y = "Cumulative probability") +
+    theme(
+      panel.grid.minor = element_blank(),
+      legend.position = c(0.85, 0.25),
+      panel.background = element_rect(fill = "lightgray"),
+      axis.text.x = element_text(colour = "black", size = 11), 
+      axis.text.y = element_text(colour = "black", size = 11),
+      legend.text = element_text(colour = "black", size = 10),
+      legend.title = element_text(colour = "black", size = 10), 
+      axis.title.y = element_text(colour = "black", size = 11), 
+      axis.title.x = element_text(colour = "black", size = 11)
+    )
+}
+
+plots <- list()
+
+for (var in variable_names) {
+  plots[[var]] <- create_plot(var)
+}
+
+png(filename = file.path(output_path,Sys.Date(),"variable_plots.png"), width = 700, height = 500)
+
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, length(variable_names))))
+
+vplayout <- function(x, y) viewport(layout.pos.row = x, layout.pos.col = y)
+
+for (i in 1:length(variable_names)) {
+  print(plots[[variable_names[i]]], vp = vplayout(1, i))
+}
+
+dev.off()
+
+# --------------------------------------------------------------------------------------#
+# Figure 2: Plotting variable distributions to highlight some examples
+# --------------------------------------------------------------------------------------#
 
 a<-ggplot(comdata, aes(x = pre_mm_cyr,colour=type)) + stat_ecdf(linewidth=1.5) +
   scale_color_manual(values=c("black","#E69F00"),name="River Segment", labels = c("All","Gauged")) + 
@@ -382,4 +423,5 @@ dev.off()
 #  )
 
 print("Done")
+
 
